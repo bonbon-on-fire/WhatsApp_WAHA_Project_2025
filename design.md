@@ -3,6 +3,7 @@
 ## 1. Design Overview
 
 ### 1.1 System Architecture
+
 The WhatsApp WPPConnect integration system consists of three main components:
 
 1. **WPPConnect Server**: Third-party service that handles WhatsApp Web connection
@@ -27,6 +28,7 @@ The WhatsApp WPPConnect integration system consists of three main components:
 ```
 
 ### 1.3 Design Philosophy
+
 - **Surgical Changes**: Build a lightweight integration layer without modifying WPPConnect Server
 - **Event-Driven**: Use webhooks and real-time communication for responsive user experience
 - **Modular Design**: Separate concerns between WhatsApp integration, business logic, and UI
@@ -37,6 +39,7 @@ The WhatsApp WPPConnect integration system consists of three main components:
 ### 2.1 WPPConnect Server Configuration
 
 #### 2.1.1 Installation and Setup
+
 ```typescript
 // config.ts example structure
 export const config = {
@@ -57,6 +60,7 @@ export const config = {
 ```
 
 #### 2.1.2 Key Endpoints Used
+
 - `POST /api/{session}/start-session` - Initialize WhatsApp session
 - `POST /api/{session}/send-message` - Send messages
 - `GET /api/{session}/check-connection-session` - Monitor connection
@@ -394,12 +398,14 @@ export interface WebhookMessageData {
 ## 4. Security Design
 
 ### 4.1 Authentication Strategy
+
 - API token-based authentication for WPPConnect Server communication
 - Session-based authentication for frontend application
 - Environment variables for sensitive configuration
 - Input validation and sanitization
 
 ### 4.2 Security Measures
+
 ```typescript
 // middleware/auth.ts
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -427,6 +433,7 @@ export const validatePhoneNumber = (phone: string): boolean => {
 ## 5. Error Handling Strategy
 
 ### 5.1 Error Categories
+
 - **Connection Errors**: WPPConnect Server unavailable
 - **Authentication Errors**: Invalid tokens or session issues
 - **Validation Errors**: Invalid input data
@@ -434,6 +441,7 @@ export const validatePhoneNumber = (phone: string): boolean => {
 - **Network Errors**: Timeout or connectivity issues
 
 ### 5.2 Error Handling Implementation
+
 ```typescript
 // utils/errorHandler.ts
 export class AppError extends Error {
@@ -468,6 +476,7 @@ export const globalErrorHandler = (err: Error, req: Request, res: Response, next
 ## 6. Performance Considerations
 
 ### 6.1 Optimization Strategies
+
 - **Message Pagination**: Load messages in chunks to reduce initial load time
 - **Connection Pooling**: Reuse HTTP connections for API calls
 - **Caching**: Cache conversation lists and recent messages
@@ -475,6 +484,7 @@ export const globalErrorHandler = (err: Error, req: Request, res: Response, next
 - **Lazy Loading**: Load media content on demand
 
 ### 6.2 Real-Time Performance
+
 ```typescript
 // Debounced message sending
 const debouncedSendMessage = debounce(async (messageData: SendMessageRequest) => {
@@ -495,6 +505,7 @@ export const getMessages = async (conversationId: string, page: number = 1, limi
 ## 7. Deployment Architecture
 
 ### 7.1 Development Environment
+
 ```yaml
 # docker-compose.dev.yml
 version: '3.8'
@@ -528,6 +539,7 @@ services:
 ```
 
 ### 7.2 Production Considerations
+
 - SSL/TLS certificates for HTTPS
 - Process management with PM2
 - Monitoring and logging setup
@@ -537,6 +549,7 @@ services:
 ## 8. Testing Strategy
 
 ### 8.1 Unit Testing
+
 ```typescript
 // Example test for message service
 describe('MessageService', () => {
@@ -560,11 +573,13 @@ describe('MessageService', () => {
 ```
 
 ### 8.2 Integration Testing
+
 - Test webhook endpoint functionality
 - Validate WPPConnect Server communication
 - End-to-end message flow testing
 
 ### 8.3 Load Testing
+
 - Simulate high message volume
 - Test concurrent session handling
 - Validate real-time performance under load
@@ -572,6 +587,7 @@ describe('MessageService', () => {
 ## 9. Monitoring and Logging
 
 ### 9.1 Logging Strategy
+
 ```typescript
 // utils/logger.ts
 import winston from 'winston';
@@ -594,6 +610,7 @@ export const logger = winston.createLogger({
 ```
 
 ### 9.2 Health Monitoring
+
 ```typescript
 // Health check endpoint
 app.get('/health', async (req, res) => {
@@ -621,12 +638,14 @@ app.get('/health', async (req, res) => {
 ## 10. Future Enhancements
 
 ### 10.1 Scalability Improvements
+
 - Multi-instance support with load balancing
 - Message queue for high-volume scenarios
 - Database clustering for message storage
 - Microservices architecture for larger deployments
 
 ### 10.2 Feature Enhancements
+
 - Multi-user support with role-based access
 - Advanced message filtering and search
 - Automated response templates
