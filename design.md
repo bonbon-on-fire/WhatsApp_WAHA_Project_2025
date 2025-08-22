@@ -1,323 +1,486 @@
-# WhatsApp WPPConnect Integration - Technical Design Document
+# WhatsApp WPPConnect CLI Integration - Technical Design Document
 
 ## 1. Design Overview
 
 ### 1.1 System Architecture
 
-The WhatsApp WPPConnect integration system consists of three main components:
+The WhatsApp WPPConnect CLI integration system consists of two main components:
 
 1. **WPPConnect Server**: Third-party service that handles WhatsApp Web connection
-2. **Application Backend**: Node.js service that interfaces with WPPConnect Server
-3. **Frontend Application**: Web-based user interface for message management
+2. **CLI Application**: Node.js command-line tool that interfaces with WPPConnect Server
 
 ### 1.2 High-Level Architecture Diagram
 
-```
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend UI   │◄──►│  Backend API    │◄──►│  WPPConnect     │
-│  (React/Vue)    │    │   (Node.js)     │    │    Server       │
+│   CLI Commands  │───►│  CLI Application │◄──►│  WPPConnect     │
+│   (User Input)  │    │   (Node.js)     │    │    Server       │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   WebSocket/    │    │   Database      │    │   WhatsApp      │
-│   Server-Sent   │    │   (Optional)    │    │     Web         │
-│   Events        │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │                       │
+                                │                       │
+                                ▼                       ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │   Terminal      │    │   WhatsApp      │
+                       │   Output        │    │     Web         │
+                       │   (Messages)    │    │                 │
+                       └─────────────────┘    └─────────────────┘
 ```
 
 ### 1.3 Design Philosophy
 
+- **Simplicity First**: Minimal dependencies and simple command-line interface
+- **Real-time Communication**: Immediate display of incoming messages in terminal
 - **Surgical Changes**: Build a lightweight integration layer without modifying WPPConnect Server
-- **Event-Driven**: Use webhooks and real-time communication for responsive user experience
-- **Modular Design**: Separate concerns between WhatsApp integration, business logic, and UI
-- **Scalable Foundation**: Design for future enhancements and multiple session support
+- **Single Purpose**: Focus solely on message sending and receiving via CLI
 
 ## 2. Component Design
 
-### 2.1 WPPConnect Server Configuration
-
-#### 2.1.1 Installation and Setup
-
-```typescript
-// config.ts example structure
-export const config = {
-  secretKey: process.env.SECRET_KEY || 'your-secret-key',
-  host: process.env.HOST || 'localhost',
-  port: process.env.PORT || 21465,
-  deviceName: process.env.DEVICE_NAME || 'WPPConnect',
-  webhook: {
-    url: process.env.WEBHOOK_URL || 'http://localhost:3000/webhook',
-    autoDownload: true,
-    uploadS3: false
-  },
-  log: {
-    level: 'silly',
-    logger: ['console', 'file']
-  }
-};
-```
-
-#### 2.1.2 Key Endpoints Used
-
-- `POST /api/{session}/start-session` - Initialize WhatsApp session
-- `POST /api/{session}/send-message` - Send messages
-- `GET /api/{session}/check-connection-session` - Monitor connection
-- `POST /api/{session}/logout-session` - Terminate session
-- `POST /api/{session}/{secretkey}/generate-token` - Authentication
-
-### 2.2 Backend Application Design
-
-#### 2.2.1 Core Modules
+### 2.1 CLI Application Structure
 
 ```typescript
 // Project structure
 src/
-├── controllers/
-│   ├── messageController.ts
-│   ├── sessionController.ts
-│   └── webhookController.ts
+├── commands/
+│   ├── start.ts
+│   ├── stop.ts
+│   ├── send.ts
+│   ├── listen.ts
+│   ├── status.ts
+│   └── index.ts
 ├── services/
 │   ├── wppConnectService.ts
 │   ├── messageService.ts
-│   └── realTimeService.ts
-├── models/
+│   └── webhookService.ts
+├── utils/
+│   ├── config.ts
+│   ├── logger.ts
+│   ├── formatter.ts
+│   └── qrCode.ts
+├── types/
 │   ├── message.ts
 │   ├── session.ts
-│   └── contact.ts
-├── middleware/
-│   ├── auth.ts
-│   └── validation.ts
-├── routes/
-│   ├── api.ts
-│   └── webhook.ts
-├── utils/
-│   ├── logger.ts
-│   └── helpers.ts
-└── app.ts
+│   └── config.ts
+└── cli.ts (main entry point)
 ```
 
-#### 2.2.2 WPPConnect Service Interface
+### 2.2 CLI Command Structure
+
+#### 2.2.1 Main CLI Entry Point
+
+```typescript
+// cli.ts
+import { Command } from 'commander';
+import { startCommand } from './commands/start';
+import { stopCommand } from './commands/stop';
+import { sendCommand } from './commands/send';
+import { listenCommand } from './commands/listen';
+import { statusCommand } from './commands/status';
+
+const program = new Command();
+
+program
+  .name('whatsapp')
+  .description('WhatsApp CLI Integration Tool')
+  .version('1.0.0');
+
+program
+  .command('start')
+  .description('Start WhatsApp session')
+  .option('-s, --session <name>', 'Session name', 'default')
+  .action(startCommand);
+
+program
+  .command('stop')
+  .description('Stop WhatsApp session')
+  .option('-s, --session <name>', 'Session name', 'default')
+  .action(stopCommand);
+
+program
+  .command('send')
+  .description('Send message to contact')
+  .argument('<phone>', 'Phone number')
+  .argument('<message>', 'Message text')
+  .option('-s, --session <name>', 'Session name', 'default')
+  .action(sendCommand);
+
+program
+  .command('listen')
+  .description('Listen for incoming messages')
+  .option('-s, --session <name>', 'Session name', 'default')
+  .option('-f, --format <type>', 'Output format: simple|json|detailed', 'simple')
+  .action(listenCommand);
+
+program
+  .command('status')
+  .description('Show connection status')
+  .option('-s, --session <name>', 'Session name', 'default')
+  .action(statusCommand);
+
+program.parse();
+```
+
+#### 2.2.2 Command Implementations
+
+```typescript
+// commands/start.ts
+export async function startCommand(options: { session: string }) {
+  const wppService = new WPPConnectService();
+  
+  try {
+    console.log(`Starting WhatsApp session: ${options.session}`);
+    
+    // Generate authentication token
+    const token = await wppService.generateToken(options.session);
+    console.log('✓ Authentication token generated');
+    
+    // Start session
+    const sessionData = await wppService.startSession(options.session);
+    
+    if (sessionData.qrCode) {
+      console.log('\nScan QR code with your phone:');
+      displayQRCode(sessionData.qrCode);
+      
+      // Wait for authentication
+      await waitForAuthentication(options.session);
+      console.log('✓ Successfully authenticated!');
+    }
+    
+    console.log(`✓ Session ${options.session} started successfully`);
+  } catch (error) {
+    console.error('✗ Failed to start session:', error.message);
+    process.exit(1);
+  }
+}
+
+// commands/send.ts
+export async function sendCommand(
+  phone: string, 
+  message: string, 
+  options: { session: string }
+) {
+  const wppService = new WPPConnectService();
+  
+  try {
+    // Validate phone number
+    if (!isValidPhoneNumber(phone)) {
+      throw new Error('Invalid phone number format');
+    }
+    
+    console.log(`Sending message to ${phone}...`);
+    
+    const result = await wppService.sendMessage(options.session, {
+      phone,
+      message
+    });
+    
+    if (result.success) {
+      console.log('✓ Message sent successfully');
+      if (result.messageId) {
+        console.log(`Message ID: ${result.messageId}`);
+      }
+    } else {
+      console.error('✗ Failed to send message:', result.message);
+    }
+  } catch (error) {
+    console.error('✗ Error sending message:', error.message);
+    process.exit(1);
+  }
+}
+
+// commands/listen.ts
+export async function listenCommand(options: { 
+  session: string; 
+  format: 'simple' | 'json' | 'detailed' 
+}) {
+  const messageService = new MessageService();
+  
+  console.log('Listening for incoming messages... (Press Ctrl+C to stop)');
+  
+  // Start webhook server
+  const webhookServer = new WebhookService();
+  await webhookServer.start();
+  
+  // Listen for messages
+  messageService.on('message', (message) => {
+    displayMessage(message, options.format);
+  });
+  
+  messageService.on('status', (status) => {
+    if (options.format === 'detailed') {
+      console.log(`[STATUS] ${status.type}: ${status.message}`);
+    }
+  });
+  
+  // Handle graceful shutdown
+  process.on('SIGINT', async () => {
+    console.log('\nStopping message listener...');
+    await webhookServer.stop();
+    process.exit(0);
+  });
+}
+```
+
+### 2.3 WPPConnect Service Layer
 
 ```typescript
 // services/wppConnectService.ts
+import axios, { AxiosInstance } from 'axios';
+import { config } from '../utils/config';
+
 export class WPPConnectService {
+  private api: AxiosInstance;
   private baseUrl: string;
   private secretKey: string;
-  private sessionToken: string;
+  private tokens: Map<string, string> = new Map();
 
-  async generateToken(sessionName: string): Promise<string>;
-  async startSession(sessionName: string): Promise<SessionResponse>;
-  async sendMessage(sessionName: string, message: SendMessageRequest): Promise<MessageResponse>;
-  async checkConnectionStatus(sessionName: string): Promise<ConnectionStatus>;
-  async logoutSession(sessionName: string): Promise<void>;
-}
-
-// Message interfaces
-interface SendMessageRequest {
-  phone: string;
-  message: string;
-  isGroup?: boolean;
-}
-
-interface MessageResponse {
-  success: boolean;
-  message: string;
-  messageId?: string;
-}
-```
-
-#### 2.2.3 Webhook Handler
-
-```typescript
-// controllers/webhookController.ts
-export class WebhookController {
-  async handleIncomingMessage(req: Request, res: Response): Promise<void> {
-    const messageData = req.body;
+  constructor() {
+    this.baseUrl = config.wppconnect.baseUrl;
+    this.secretKey = config.wppconnect.secretKey;
     
-    // Process incoming message
-    await this.messageService.processIncomingMessage(messageData);
-    
-    // Broadcast to connected clients
-    this.realTimeService.broadcast('new-message', messageData);
-    
-    res.status(200).json({ status: 'received' });
-  }
-
-  async handleStatusUpdate(req: Request, res: Response): Promise<void> {
-    const statusData = req.body;
-    
-    // Update message status
-    await this.messageService.updateMessageStatus(statusData);
-    
-    // Notify clients
-    this.realTimeService.broadcast('status-update', statusData);
-    
-    res.status(200).json({ status: 'processed' });
-  }
-}
-```
-
-#### 2.2.4 Real-Time Communication
-
-```typescript
-// services/realTimeService.ts
-export class RealTimeService {
-  private io: Server;
-
-  initializeWebSocket(server: http.Server): void {
-    this.io = new Server(server, {
-      cors: { origin: "*" }
-    });
-
-    this.io.on('connection', (socket) => {
-      console.log('Client connected:', socket.id);
-
-      socket.on('join-session', (sessionName) => {
-        socket.join(`session-${sessionName}`);
-      });
-
-      socket.on('send-message', async (data) => {
-        await this.handleOutgoingMessage(data);
-      });
-
-      socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-      });
+    this.api = axios.create({
+      baseURL: this.baseUrl,
+      timeout: 30000,
     });
   }
 
-  broadcast(event: string, data: any, sessionName?: string): void {
-    if (sessionName) {
-      this.io.to(`session-${sessionName}`).emit(event, data);
-    } else {
-      this.io.emit(event, data);
-    }
-  }
-}
-```
-
-### 2.3 Frontend Application Design
-
-#### 2.3.1 Component Architecture (React Example)
-
-```typescript
-// Component structure
-src/
-├── components/
-│   ├── common/
-│   │   ├── Header.tsx
-│   │   ├── Sidebar.tsx
-│   │   └── LoadingSpinner.tsx
-│   ├── chat/
-│   │   ├── ConversationList.tsx
-│   │   ├── MessageThread.tsx
-│   │   ├── MessageInput.tsx
-│   │   └── MessageBubble.tsx
-│   ├── session/
-│   │   ├── SessionManager.tsx
-│   │   ├── QRCodeDisplay.tsx
-│   │   └── ConnectionStatus.tsx
-│   └── settings/
-│       └── Settings.tsx
-├── services/
-│   ├── apiService.ts
-│   ├── socketService.ts
-│   └── messageService.ts
-├── store/
-│   ├── messageStore.ts
-│   ├── sessionStore.ts
-│   └── appStore.ts
-├── hooks/
-│   ├── useSocket.ts
-│   ├── useMessages.ts
-│   └── useSession.ts
-└── App.tsx
-```
-
-#### 2.3.2 State Management (Zustand Example)
-
-```typescript
-// store/messageStore.ts
-interface MessageStore {
-  conversations: Conversation[];
-  currentConversation: string | null;
-  messages: Message[];
-  isLoading: boolean;
-  
-  // Actions
-  addMessage: (message: Message) => void;
-  updateMessageStatus: (messageId: string, status: MessageStatus) => void;
-  setCurrentConversation: (conversationId: string) => void;
-  sendMessage: (message: SendMessageRequest) => Promise<void>;
-}
-
-export const useMessageStore = create<MessageStore>((set, get) => ({
-  conversations: [],
-  currentConversation: null,
-  messages: [],
-  isLoading: false,
-
-  addMessage: (message) => set((state) => ({
-    messages: [...state.messages, message]
-  })),
-
-  updateMessageStatus: (messageId, status) => set((state) => ({
-    messages: state.messages.map(msg => 
-      msg.id === messageId ? { ...msg, status } : msg
-    )
-  })),
-
-  sendMessage: async (messageData) => {
-    set({ isLoading: true });
+  async generateToken(sessionName: string): Promise<string> {
     try {
-      await apiService.sendMessage(messageData);
-    } finally {
-      set({ isLoading: false });
+      const response = await this.api.post(
+        `/api/${sessionName}/${this.secretKey}/generate-token`
+      );
+      
+      const token = response.data.token;
+      this.tokens.set(sessionName, token);
+      
+      return token;
+    } catch (error) {
+      throw new Error(`Failed to generate token: ${error.message}`);
     }
   }
-}));
+
+  async startSession(sessionName: string): Promise<SessionResponse> {
+    const token = this.tokens.get(sessionName);
+    if (!token) {
+      throw new Error('No authentication token found. Run generate-token first.');
+    }
+
+    try {
+      const response = await this.api.post(
+        `/api/${sessionName}/start-session`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to start session: ${error.message}`);
+    }
+  }
+
+  async sendMessage(
+    sessionName: string, 
+    messageData: SendMessageRequest
+  ): Promise<MessageResponse> {
+    const token = this.tokens.get(sessionName);
+    if (!token) {
+      throw new Error('No authentication token found. Start session first.');
+    }
+
+    try {
+      const response = await this.api.post(
+        `/api/${sessionName}/send-message`,
+        messageData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to send message: ${error.message}`);
+    }
+  }
+
+  async checkConnectionStatus(sessionName: string): Promise<ConnectionStatus> {
+    const token = this.tokens.get(sessionName);
+    if (!token) {
+      throw new Error('No authentication token found.');
+    }
+
+    try {
+      const response = await this.api.get(
+        `/api/${sessionName}/check-connection-session`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(`Failed to check connection: ${error.message}`);
+    }
+  }
+}
 ```
 
-#### 2.3.3 WebSocket Integration
+### 2.4 Webhook Service for Receiving Messages
 
 ```typescript
-// hooks/useSocket.ts
-export const useSocket = (sessionName: string) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [connected, setConnected] = useState(false);
-  const addMessage = useMessageStore(state => state.addMessage);
+// services/webhookService.ts
+import express from 'express';
+import { EventEmitter } from 'events';
+import { MessageService } from './messageService';
+import { config } from '../utils/config';
 
-  useEffect(() => {
-    const newSocket = io(process.env.REACT_APP_BACKEND_URL);
-    
-    newSocket.on('connect', () => {
-      setConnected(true);
-      newSocket.emit('join-session', sessionName);
+export class WebhookService extends EventEmitter {
+  private app: express.Application;
+  private server: any;
+  private messageService: MessageService;
+
+  constructor() {
+    super();
+    this.app = express();
+    this.messageService = new MessageService();
+    this.setupMiddleware();
+    this.setupRoutes();
+  }
+
+  private setupMiddleware() {
+    this.app.use(express.json({ limit: '50mb' }));
+    this.app.use(express.urlencoded({ extended: true }));
+  }
+
+  private setupRoutes() {
+    this.app.post('/webhook', (req, res) => {
+      try {
+        const messageData = req.body;
+        this.messageService.processIncomingMessage(messageData);
+        res.status(200).json({ status: 'received' });
+      } catch (error) {
+        console.error('Webhook error:', error);
+        res.status(500).json({ error: 'Processing failed' });
+      }
     });
 
-    newSocket.on('new-message', (message: Message) => {
-      addMessage(message);
+    this.app.get('/health', (req, res) => {
+      res.json({ status: 'healthy', timestamp: new Date().toISOString() });
     });
+  }
 
-    newSocket.on('status-update', (update: StatusUpdate) => {
-      // Handle status updates
+  async start(): Promise<void> {
+    return new Promise((resolve) => {
+      const port = config.webhook.port || 3000;
+      this.server = this.app.listen(port, () => {
+        console.log(`Webhook server listening on port ${port}`);
+        resolve();
+      });
     });
+  }
 
-    newSocket.on('disconnect', () => {
-      setConnected(false);
+  async stop(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.server) {
+        this.server.close(() => {
+          console.log('Webhook server stopped');
+          resolve();
+        });
+      } else {
+        resolve();
+      }
     });
+  }
+}
+```
 
-    setSocket(newSocket);
+### 2.5 Message Processing and Display
 
-    return () => {
-      newSocket.close();
+```typescript
+// services/messageService.ts
+import { EventEmitter } from 'events';
+import { formatMessage } from '../utils/formatter';
+
+export class MessageService extends EventEmitter {
+  
+  processIncomingMessage(messageData: WebhookMessageData): void {
+    try {
+      const message = this.parseMessage(messageData);
+      
+      // Emit message event for listeners
+      this.emit('message', message);
+      
+      // Log message for debugging
+      console.log('Processed message:', message.id);
+    } catch (error) {
+      console.error('Error processing message:', error);
+      this.emit('error', error);
+    }
+  }
+
+  private parseMessage(data: WebhookMessageData): Message {
+    return {
+      id: data.data.id,
+      content: data.data.body,
+      sender: data.data.senderName || data.data.from,
+      senderPhone: data.data.from,
+      timestamp: new Date(data.data.timestamp * 1000),
+      messageType: data.data.type as MessageType,
+      isFromMe: data.data.fromMe,
+      chatName: data.data.chatName,
+      isGroup: data.data.from.includes('@g.us'),
     };
-  }, [sessionName]);
+  }
+}
 
-  return { socket, connected };
-};
+// utils/formatter.ts
+export function displayMessage(message: Message, format: string): void {
+  const timestamp = message.timestamp.toLocaleString();
+  
+  switch (format) {
+    case 'json':
+      console.log(JSON.stringify(message, null, 2));
+      break;
+      
+    case 'detailed':
+      console.log('─'.repeat(50));
+      console.log(`From: ${message.sender} (${message.senderPhone})`);
+      console.log(`Time: ${timestamp}`);
+      console.log(`Type: ${message.messageType}`);
+      if (message.isGroup) {
+        console.log(`Group: ${message.chatName}`);
+      }
+      console.log(`Message: ${message.content}`);
+      console.log('─'.repeat(50));
+      break;
+      
+    case 'simple':
+    default:
+      const prefix = message.isGroup ? `${message.chatName}: ${message.sender}` : message.sender;
+      console.log(`[${timestamp}] ${prefix}: ${message.content}`);
+      break;
+  }
+}
+
+export function displayQRCode(qrCode: string): void {
+  // Convert QR code to terminal display
+  const QRCode = require('qrcode');
+  
+  QRCode.toString(qrCode, { type: 'terminal' }, (err: any, qrString: string) => {
+    if (err) {
+      console.error('Failed to display QR code:', err);
+      console.log('QR Code Data:', qrCode);
+    } else {
+      console.log(qrString);
+    }
+  });
+}
 ```
 
 ## 3. Data Models
@@ -325,52 +488,78 @@ export const useSocket = (sessionName: string) => {
 ### 3.1 Core Data Structures
 
 ```typescript
-// models/message.ts
+// types/message.ts
 export interface Message {
   id: string;
-  conversationId: string;
-  senderId: string;
-  senderName: string;
   content: string;
-  messageType: 'text' | 'image' | 'document' | 'audio' | 'video';
+  sender: string;
+  senderPhone: string;
   timestamp: Date;
-  status: 'sent' | 'delivered' | 'read' | 'failed';
+  messageType: MessageType;
   isFromMe: boolean;
-  quotedMessage?: Message;
-  mediaUrl?: string;
-}
-
-// models/conversation.ts
-export interface Conversation {
-  id: string;
-  name: string;
-  phoneNumber: string;
+  chatName?: string;
   isGroup: boolean;
-  lastMessage?: Message;
-  lastMessageTime: Date;
-  unreadCount: number;
-  participants?: Participant[];
+  mediaUrl?: string;
+  mediaData?: MediaData;
 }
 
-// models/session.ts
-export interface Session {
-  name: string;
-  status: 'disconnected' | 'connecting' | 'connected' | 'authenticated';
+export type MessageType = 'text' | 'image' | 'document' | 'audio' | 'video' | 'sticker';
+
+export interface MediaData {
+  filename: string;
+  mimetype: string;
+  size: number;
+  data?: string; // base64 encoded
+}
+
+// types/session.ts
+export interface SessionResponse {
+  success: boolean;
+  message: string;
   qrCode?: string;
-  lastConnected?: Date;
+  sessionName: string;
+  connected: boolean;
+}
+
+export interface ConnectionStatus {
+  connected: boolean;
   phoneNumber?: string;
+  batteryLevel?: number;
+  platform?: string;
+  lastSeen?: Date;
+}
+
+// types/config.ts
+export interface Config {
+  wppconnect: {
+    baseUrl: string;
+    secretKey: string;
+  };
+  webhook: {
+    port: number;
+    path: string;
+  };
+  logging: {
+    level: string;
+    file?: string;
+  };
 }
 ```
 
 ### 3.2 API Request/Response Models
 
 ```typescript
-// API interfaces
 export interface SendMessageRequest {
-  sessionName: string;
   phone: string;
   message: string;
-  quotedMessageId?: string;
+  isGroup?: boolean;
+}
+
+export interface MessageResponse {
+  success: boolean;
+  message: string;
+  messageId?: string;
+  error?: string;
 }
 
 export interface WebhookMessageData {
@@ -395,261 +584,278 @@ export interface WebhookMessageData {
 }
 ```
 
-## 4. Security Design
+## 4. Configuration Management
 
-### 4.1 Authentication Strategy
-
-- API token-based authentication for WPPConnect Server communication
-- Session-based authentication for frontend application
-- Environment variables for sensitive configuration
-- Input validation and sanitization
-
-### 4.2 Security Measures
+### 4.1 Configuration File Structure
 
 ```typescript
-// middleware/auth.ts
-export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+// utils/config.ts
+import { Config } from '../types/config';
+import path from 'path';
+import fs from 'fs';
 
-  if (!token) {
-    return res.sendStatus(401);
+const configPath = path.join(process.cwd(), 'whatsapp.config.json');
+
+const defaultConfig: Config = {
+  wppconnect: {
+    baseUrl: 'http://localhost:21465',
+    secretKey: process.env.WPPCONNECT_SECRET || 'your-secret-key'
+  },
+  webhook: {
+    port: 3000,
+    path: '/webhook'
+  },
+  logging: {
+    level: 'info',
+    file: 'whatsapp-cli.log'
   }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
 };
 
-// Input validation
-export const validatePhoneNumber = (phone: string): boolean => {
-  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-  return phoneRegex.test(phone);
-};
+export function loadConfig(): Config {
+  try {
+    if (fs.existsSync(configPath)) {
+      const configFile = fs.readFileSync(configPath, 'utf8');
+      const userConfig = JSON.parse(configFile);
+      return { ...defaultConfig, ...userConfig };
+    }
+  } catch (error) {
+    console.warn('Warning: Could not load config file, using defaults');
+  }
+  
+  return defaultConfig;
+}
+
+export function saveConfig(config: Config): void {
+  try {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  } catch (error) {
+    console.error('Failed to save config:', error.message);
+  }
+}
+
+export const config = loadConfig();
 ```
 
 ## 5. Error Handling Strategy
 
-### 5.1 Error Categories
-
-- **Connection Errors**: WPPConnect Server unavailable
-- **Authentication Errors**: Invalid tokens or session issues
-- **Validation Errors**: Invalid input data
-- **Rate Limiting**: API call limits exceeded
-- **Network Errors**: Timeout or connectivity issues
-
-### 5.2 Error Handling Implementation
+### 5.1 Error Categories and Handling
 
 ```typescript
-// utils/errorHandler.ts
-export class AppError extends Error {
-  statusCode: number;
-  isOperational: boolean;
-
-  constructor(message: string, statusCode: number) {
+// utils/errors.ts
+export class WhatsAppCLIError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode?: number
+  ) {
     super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
+    this.name = 'WhatsAppCLIError';
   }
 }
 
-export const globalErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
-      status: 'error',
-      message: err.message
-    });
+export class ConnectionError extends WhatsAppCLIError {
+  constructor(message: string) {
+    super(message, 'CONNECTION_ERROR', 503);
   }
+}
 
-  // Log unexpected errors
-  console.error('Unexpected error:', err);
-  
-  res.status(500).json({
-    status: 'error',
-    message: 'Something went wrong'
-  });
-};
-```
-
-## 6. Performance Considerations
-
-### 6.1 Optimization Strategies
-
-- **Message Pagination**: Load messages in chunks to reduce initial load time
-- **Connection Pooling**: Reuse HTTP connections for API calls
-- **Caching**: Cache conversation lists and recent messages
-- **Debouncing**: Rate limit API calls for typing indicators
-- **Lazy Loading**: Load media content on demand
-
-### 6.2 Real-Time Performance
-
-```typescript
-// Debounced message sending
-const debouncedSendMessage = debounce(async (messageData: SendMessageRequest) => {
-  try {
-    await wppConnectService.sendMessage(messageData);
-  } catch (error) {
-    // Handle error
+export class AuthenticationError extends WhatsAppCLIError {
+  constructor(message: string) {
+    super(message, 'AUTH_ERROR', 401);
   }
-}, 300);
+}
 
-// Message pagination
-export const getMessages = async (conversationId: string, page: number = 1, limit: number = 50) => {
-  const offset = (page - 1) * limit;
-  return await messageService.getConversationMessages(conversationId, offset, limit);
-};
+export class ValidationError extends WhatsAppCLIError {
+  constructor(message: string) {
+    super(message, 'VALIDATION_ERROR', 400);
+  }
+}
+
+export function handleError(error: Error): void {
+  if (error instanceof WhatsAppCLIError) {
+    console.error(`✗ ${error.message}`);
+    if (process.env.DEBUG) {
+      console.error(`Code: ${error.code}`);
+    }
+  } else {
+    console.error('✗ Unexpected error:', error.message);
+    if (process.env.DEBUG) {
+      console.error(error.stack);
+    }
+  }
+}
 ```
 
-## 7. Deployment Architecture
+## 6. Logging and Monitoring
 
-### 7.1 Development Environment
-
-```yaml
-# docker-compose.dev.yml
-version: '3.8'
-services:
-  wppconnect-server:
-    image: wppconnect/server:latest
-    ports:
-      - "21465:21465"
-    environment:
-      - SECRET_KEY=dev-secret
-      - WEBHOOK_URL=http://backend:3000/webhook
-    
-  backend:
-    build: ./backend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - wppconnect-server
-    environment:
-      - WPPCONNECT_URL=http://wppconnect-server:21465
-      - NODE_ENV=development
-    
-  frontend:
-    build: ./frontend
-    ports:
-      - "3001:3000"
-    depends_on:
-      - backend
-    environment:
-      - REACT_APP_BACKEND_URL=http://localhost:3000
-```
-
-### 7.2 Production Considerations
-
-- SSL/TLS certificates for HTTPS
-- Process management with PM2
-- Monitoring and logging setup
-- Database backup strategy (if using database)
-- Environment-specific configuration management
-
-## 8. Testing Strategy
-
-### 8.1 Unit Testing
-
-```typescript
-// Example test for message service
-describe('MessageService', () => {
-  it('should process incoming message correctly', async () => {
-    const mockMessageData = {
-      instanceName: 'test-session',
-      data: {
-        id: 'msg-123',
-        body: 'Hello World',
-        from: '1234567890@c.us',
-        timestamp: Date.now()
-      }
-    };
-
-    const result = await messageService.processIncomingMessage(mockMessageData);
-    
-    expect(result).toBeDefined();
-    expect(result.content).toBe('Hello World');
-  });
-});
-```
-
-### 8.2 Integration Testing
-
-- Test webhook endpoint functionality
-- Validate WPPConnect Server communication
-- End-to-end message flow testing
-
-### 8.3 Load Testing
-
-- Simulate high message volume
-- Test concurrent session handling
-- Validate real-time performance under load
-
-## 9. Monitoring and Logging
-
-### 9.1 Logging Strategy
+### 6.1 Logging Implementation
 
 ```typescript
 // utils/logger.ts
 import winston from 'winston';
+import { config } from './config';
 
 export const logger = winston.createLogger({
-  level: 'info',
+  level: config.logging.level,
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
     new winston.transports.Console({
-      format: winston.format.simple()
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
     })
   ]
 });
+
+// Add file logging if configured
+if (config.logging.file) {
+  logger.add(new winston.transports.File({
+    filename: config.logging.file,
+    level: 'info'
+  }));
+  
+  logger.add(new winston.transports.File({
+    filename: 'error.log',
+    level: 'error'
+  }));
+}
 ```
 
-### 9.2 Health Monitoring
+## 7. Installation and Distribution
+
+### 7.1 NPM Package Configuration
+
+```json
+// package.json
+{
+  "name": "whatsapp-cli",
+  "version": "1.0.0",
+  "description": "Command-line WhatsApp integration using WPPConnect",
+  "main": "dist/cli.js",
+  "bin": {
+    "whatsapp": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js",
+    "test": "jest",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^9.0.0",
+    "axios": "^1.0.0",
+    "express": "^4.18.0",
+    "winston": "^3.8.0",
+    "qrcode": "^1.5.0",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^4.8.0",
+    "ts-node": "^10.9.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "cli",
+    "wppconnect",
+    "messaging"
+  ]
+}
+```
+
+### 7.2 Build and Distribution
+
+```bash
+# Build process
+npm run build
+
+# Global installation
+npm install -g whatsapp-cli
+
+# Local installation
+npm install whatsapp-cli
+
+# Usage after installation
+whatsapp start
+whatsapp send +1234567890 "Hello World"
+whatsapp listen
+```
+
+## 8. Testing Strategy
+
+### 8.1 Unit Testing Examples
 
 ```typescript
-// Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    const wppStatus = await wppConnectService.checkConnectionStatus('default');
+// tests/services/wppConnectService.test.ts
+import { WPPConnectService } from '../../src/services/wppConnectService';
+
+describe('WPPConnectService', () => {
+  let service: WPPConnectService;
+
+  beforeEach(() => {
+    service = new WPPConnectService();
+  });
+
+  it('should generate authentication token', async () => {
+    const mockResponse = { data: { token: 'test-token' } };
+    jest.spyOn(service['api'], 'post').mockResolvedValue(mockResponse);
+
+    const token = await service.generateToken('test-session');
     
-    res.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      services: {
-        wppconnect: wppStatus.connected ? 'up' : 'down',
-        database: 'up', // if using database
-        websocket: 'up'
-      }
+    expect(token).toBe('test-token');
+  });
+
+  it('should send message successfully', async () => {
+    const mockResponse = { 
+      data: { 
+        success: true, 
+        messageId: 'msg-123' 
+      } 
+    };
+    
+    jest.spyOn(service['api'], 'post').mockResolvedValue(mockResponse);
+
+    const result = await service.sendMessage('test-session', {
+      phone: '+1234567890',
+      message: 'Test message'
     });
-  } catch (error) {
-    res.status(503).json({
-      status: 'unhealthy',
-      error: error.message
-    });
-  }
+
+    expect(result.success).toBe(true);
+    expect(result.messageId).toBe('msg-123');
+  });
 });
 ```
 
-## 10. Future Enhancements
+## 9. Deployment and Production
 
-### 10.1 Scalability Improvements
+### 9.1 Production Considerations
 
-- Multi-instance support with load balancing
-- Message queue for high-volume scenarios
-- Database clustering for message storage
-- Microservices architecture for larger deployments
+```bash
+# PM2 process management
+pm2 start ecosystem.config.js
 
-### 10.2 Feature Enhancements
+# Environment variables
+export WPPCONNECT_SECRET="your-production-secret"
+export NODE_ENV="production"
 
-- Multi-user support with role-based access
-- Advanced message filtering and search
-- Automated response templates
-- Integration with CRM systems
-- Analytics and reporting dashboard
+# Logging
+mkdir -p /var/log/whatsapp-cli
+chown app:app /var/log/whatsapp-cli
 
-This design document provides a comprehensive foundation for implementing the WhatsApp WPPConnect integration while maintaining flexibility for future enhancements and scalability requirements.
+# Systemd service (optional)
+sudo systemctl enable whatsapp-cli
+sudo systemctl start whatsapp-cli
+```
+
+This simplified design focuses entirely on CLI functionality while maintaining the core WhatsApp integration capabilities you need. The architecture is much simpler, easier to implement, and perfectly suited for terminal-based message management.

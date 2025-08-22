@@ -1,30 +1,30 @@
-# WhatsApp WPPConnect Integration - Task Breakdown
+# WhatsApp WPPConnect CLI Integration - Task Breakdown
 
 ## Task Overview
 
-This document breaks down the implementation of the WhatsApp WPPConnect integration project into manageable tasks. Each task is linked to specific requirements from `requirements.md` and follows the design outlined in `design.md`.
+This document breaks down the implementation of the WhatsApp WPPConnect CLI integration project into manageable tasks. Each task is linked to specific requirements from `requirements.md` and follows the design outlined in `design.md`.
 
-## Phase 1: Foundation and Setup
+## Phase 1: Foundation and CLI Setup
 
 ### Task 1: Project Environment Setup
 
-- [ ] Initialize project structure for backend and frontend
-- [ ] Set up development environment with Node.js and package managers
+- [ ] Initialize Node.js project with TypeScript
+- [ ] Set up package.json with CLI configuration and dependencies
 - [ ] Configure Git repository with proper `.gitignore` files
 - [ ] Set up environment configuration management
-- [ ] Create basic Docker setup for development
+- [ ] Create basic project structure for CLI application
   
 **Requirements:**
 
 - [ ] T1.1 - WPPConnect Server for WhatsApp integration
 - [ ] T1.2 - Node.js runtime environment
-- [ ] T3.2 - Environment configuration management
+- [ ] T1.3 - CLI framework (Commander.js or similar)
 
 **Tests:**
 
 - [ ] Test 1: Verify project structure is created correctly
-- [ ] Test 2: Ensure environment variables are loaded properly
-- [ ] Test 3: Validate Docker containers start without errors
+- [ ] Test 2: Ensure TypeScript compilation works
+- [ ] Test 3: Validate CLI entry point is executable
 
 ### Task 2: WPPConnect Server Installation and Configuration
 
@@ -47,26 +47,26 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 - [ ] Test 3: Authentication token generation works
 - [ ] Test 4: Webhook configuration is properly set
 
-### Task 3: Backend API Foundation
+### Task 3: CLI Framework Setup
 
-- [ ] Create Express.js server with TypeScript setup
-- [ ] Implement basic routing structure (API and webhook routes)
-- [ ] Set up middleware for authentication, logging, and error handling
-- [ ] Configure CORS for frontend communication
-- [ ] Implement health check endpoint
+- [ ] Install and configure Commander.js for CLI commands
+- [ ] Create main CLI entry point with basic command structure
+- [ ] Implement help system and version information
+- [ ] Set up CLI argument parsing and validation
+- [ ] Configure executable permissions and global installation
 
 **Requirements:**
 
-- [ ] T1.3 - RESTful API architecture
-- [ ] NF3.3 - Protection against unauthorized access
-- [ ] NF2.4 - Graceful error handling and recovery
+- [ ] T1.3 - CLI framework (Commander.js or similar)
+- [ ] F4.4 - Provide help commands and usage instructions
+- [ ] NF4.1 - Intuitive command-line interface
 
 **Tests:**
 
-- [ ] Test 1: Server starts and responds to basic requests
-- [ ] Test 2: Authentication middleware blocks unauthorized requests
-- [ ] Test 3: Error handling middleware catches and formats errors properly
-- [ ] Test 4: Health check endpoint returns correct status
+- [ ] Test 1: CLI commands are recognized and parsed correctly
+- [ ] Test 2: Help system displays proper information
+- [ ] Test 3: Version information is displayed correctly
+- [ ] Test 4: Invalid commands show appropriate error messages
 
 ## Phase 2: Core WhatsApp Integration
 
@@ -82,8 +82,8 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 
 - [ ] F1.2 - Authenticate WhatsApp session using QR code scanning
 - [ ] F1.3 - Maintain persistent WhatsApp connection
-- [ ] F3.1 - Send text messages to individual contacts
-- [ ] F5.1 - Start and stop WhatsApp sessions
+- [ ] F3.1 - Send text messages to individual contacts via CLI
+- [ ] F5.1 - Start and stop WhatsApp sessions via CLI
 
 **Tests:**
 
@@ -93,270 +93,197 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 - [ ] Test 4: Connection status is monitored accurately
 - [ ] Test 5: Session can be stopped gracefully
 
-### Task 5: Webhook Implementation for Message Receiving
+### Task 5: CLI Commands Implementation
 
-- [ ] Create webhook endpoint to receive incoming messages
-- [ ] Implement message data validation and processing
-- [ ] Add support for different message types (text, media)
-- [ ] Handle message status updates (delivered, read)
+- [ ] Implement `whatsapp start` command for session initialization
+- [ ] Create `whatsapp send` command for message sending
+- [ ] Add `whatsapp status` command for connection monitoring
+- [ ] Implement `whatsapp stop` command for session termination
+- [ ] Create `whatsapp qr` command for QR code display
+
+**Requirements:**
+
+- [ ] F5.1 - Start and stop WhatsApp sessions via CLI
+- [ ] F3.1 - Send text messages to individual contacts via CLI
+- [ ] F5.2 - Monitor session connection status
+- [ ] F1.2 - Authenticate WhatsApp session using QR code scanning
+
+**Tests:**
+
+- [ ] Test 1: Start command initializes session properly
+- [ ] Test 2: Send command delivers messages successfully
+- [ ] Test 3: Status command shows accurate connection info
+- [ ] Test 4: Stop command terminates session cleanly
+- [ ] Test 5: QR command displays scannable QR code
+
+### Task 6: QR Code Display and Authentication
+
+- [ ] Implement QR code generation and terminal display
+- [ ] Add QR code rendering using qrcode-terminal library
+- [ ] Create authentication waiting mechanism
+- [ ] Implement session state monitoring during auth
+- [ ] Add timeout handling for authentication process
+
+**Requirements:**
+
+- [ ] F1.2 - Authenticate WhatsApp session using QR code scanning
+- [ ] F5.2 - Monitor session connection status
+- [ ] NF4.2 - Clear error messages and notifications
+
+**Tests:**
+
+- [ ] Test 1: QR code is generated and displayed in terminal
+- [ ] Test 2: Authentication process completes successfully
+- [ ] Test 3: Session state is monitored during authentication
+- [ ] Test 4: Timeout errors are handled gracefully
+- [ ] Test 5: Invalid QR codes are handled properly
+
+## Phase 3: Message Processing
+
+### Task 7: Webhook Implementation for Message Receiving
+
+- [ ] Create Express.js webhook server for incoming messages
+- [ ] Implement webhook endpoint to receive message data
+- [ ] Add message data validation and processing
+- [ ] Handle different message types (text, media)
 - [ ] Implement error handling for webhook failures
 
 **Requirements:**
 
 - [ ] F2.1 - Receive all incoming WhatsApp messages in real-time
-- [ ] F2.2 - Capture message metadata (sender, timestamp, message type)
+- [ ] F2.2 - Display messages in terminal with sender, timestamp, and content
 - [ ] F2.6 - Handle message status updates (delivered, read)
 - [ ] T2.2 - Webhook endpoint for receiving messages
 
 **Tests:**
 
-- [ ] Test 1: Webhook receives and processes text messages correctly
-- [ ] Test 2: Message metadata is extracted properly
-- [ ] Test 3: Different message types are handled appropriately
-- [ ] Test 4: Status updates are processed correctly
+- [ ] Test 1: Webhook server starts and accepts connections
+- [ ] Test 2: Incoming messages are received and processed
+- [ ] Test 3: Message metadata is extracted correctly
+- [ ] Test 4: Different message types are handled appropriately
 - [ ] Test 5: Invalid webhook data is rejected gracefully
 
-### Task 6: Real-Time Communication Setup
+### Task 8: Message Display and Formatting
 
-- [ ] Implement WebSocket server using Socket.IO
-- [ ] Create event handlers for client connections and disconnections
-- [ ] Add room-based communication for different sessions
-- [ ] Implement message broadcasting to connected clients
-- [ ] Add connection management and error handling
-
-**Requirements:**
-
-- [ ] T1.4 - WebSocket/SSE for real-time communication
-- [ ] F4.6 - Real-time message updates without page refresh
-- [ ] NF1.2 - Real-time message updates < 1 second latency
-
-**Tests:**
-
-- [ ] Test 1: WebSocket server accepts client connections
-- [ ] Test 2: Messages are broadcast to connected clients in real-time
-- [ ] Test 3: Clients can join and leave session rooms
-- [ ] Test 4: Connection errors are handled gracefully
-- [ ] Test 5: Multiple concurrent connections work properly
-
-## Phase 3: Data Models and Storage
-
-### Task 7: Core Data Models Implementation
-
-- [ ] Define TypeScript interfaces for Message, Conversation, and Session
-- [ ] Implement data validation schemas using Zod or similar
-- [ ] Create utility functions for data transformation
-- [ ] Add phone number validation and formatting
-- [ ] Implement message ID generation and management
+- [ ] Implement message parsing from webhook data
+- [ ] Create terminal message formatting (simple, detailed, JSON)
+- [ ] Add timestamp formatting and display
+- [ ] Implement group message handling with participant info
+- [ ] Add color coding and visual formatting for better readability
 
 **Requirements:**
 
-- [ ] F2.2 - Capture message metadata (sender, timestamp, message type)
-- [ ] NF3.5 - Input validation and sanitization
-- [ ] F3.4 - Validate recipient phone numbers
+- [ ] F2.2 - Display messages in terminal with sender, timestamp, and content
+- [ ] F2.5 - Support group messages with participant identification
+- [ ] F4.2 - Display real-time incoming messages with formatting
 
 **Tests:**
 
-- [ ] Test 1: Data models validate input correctly
-- [ ] Test 2: Phone number validation works for different formats
-- [ ] Test 3: Message IDs are generated uniquely
-- [ ] Test 4: Data transformation functions work correctly
-- [ ] Test 5: Invalid data is rejected with appropriate errors
+- [ ] Test 1: Messages are parsed and formatted correctly
+- [ ] Test 2: Timestamps are displayed in readable format
+- [ ] Test 3: Group messages show participant information
+- [ ] Test 4: Different output formats work correctly
+- [ ] Test 5: Color coding enhances readability
 
-### Task 8: Message Service Implementation
+### Task 9: Listen Command Implementation
 
-- [ ] Create MessageService class for message operations
-- [ ] Implement message processing for incoming messages
-- [ ] Add message formatting and sanitization
-- [ ] Create conversation grouping logic
-- [ ] Implement message storage (in-memory for MVP, optional database)
+- [ ] Create `whatsapp listen` command for real-time message monitoring
+- [ ] Implement continuous message listening with proper event handling
+- [ ] Add graceful shutdown on Ctrl+C signal
+- [ ] Implement different output formats (simple, detailed, JSON)
+- [ ] Add message filtering and display options
 
 **Requirements:**
 
 - [ ] F2.1 - Receive all incoming WhatsApp messages in real-time
-- [ ] F4.1 - Display conversation list with recent messages
-- [ ] F4.2 - Show individual conversation threads
-
-**Tests:**
-
-- [ ] Test 1: Incoming messages are processed and stored correctly
-- [ ] Test 2: Messages are grouped by conversation properly
-- [ ] Test 3: Message sanitization prevents XSS attacks
-- [ ] Test 4: Conversation metadata is maintained accurately
-- [ ] Test 5: Message retrieval by conversation works
-
-## Phase 4: Frontend Application
-
-### Task 9: Frontend Project Setup
-
-- [ ] Initialize React/Vue project with TypeScript
-- [ ] Set up build tools and development server
-- [ ] Configure state management (Zustand/Redux)
-- [ ] Add CSS framework and styling setup
-- [ ] Install and configure WebSocket client library
-
-**Requirements:**
-
-- [ ] T1.5 - Modern web framework (React/Vue/Angular)
-- [ ] NF4.1 - Intuitive and responsive user interface
-- [ ] NF4.4 - Mobile-responsive design (optional)
-
-**Tests:**
-
-- [ ] Test 1: Frontend project builds successfully
-- [ ] Test 2: Development server starts and serves application
-- [ ] Test 3: State management is configured correctly
-- [ ] Test 4: Styling framework is applied properly
-- [ ] Test 5: WebSocket client connects to backend
-
-### Task 10: Core UI Components
-
-- [ ] Create Header component with session status indicator
-- [ ] Implement ConversationList component with recent conversations
-- [ ] Build MessageThread component for displaying messages
-- [ ] Create MessageInput component for composing messages
-- [ ] Add MessageBubble component for individual message display
-
-**Requirements:**
-
-- [ ] F4.1 - Display conversation list with recent messages
-- [ ] F4.2 - Show individual conversation threads
-- [ ] F4.3 - Provide message composition interface
-- [ ] F4.4 - Display message status indicators
-
-**Tests:**
-
-- [ ] Test 1: Header displays session status correctly
-- [ ] Test 2: Conversation list shows recent conversations
-- [ ] Test 3: Message thread displays messages in correct order
-- [ ] Test 4: Message input allows text composition and sending
-- [ ] Test 5: Message bubbles show content and status properly
-
-### Task 11: WebSocket Integration in Frontend
-
-- [ ] Create custom hooks for WebSocket connection management
-- [ ] Implement real-time message receiving and display
-- [ ] Add connection status monitoring in UI
-- [ ] Handle WebSocket reconnection logic
-- [ ] Implement optimistic UI updates for sent messages
-
-**Requirements:**
-
-- [ ] F4.6 - Real-time message updates without page refresh
+- [ ] F4.2 - Display real-time incoming messages with formatting
 - [ ] NF1.2 - Real-time message updates < 1 second latency
-- [ ] NF2.2 - Automatic reconnection on connection failures
 
 **Tests:**
 
-- [ ] Test 1: WebSocket connection is established automatically
-- [ ] Test 2: Incoming messages appear in UI immediately
-- [ ] Test 3: Connection status is displayed accurately
-- [ ] Test 4: Reconnection works after temporary disconnection
-- [ ] Test 5: Optimistic updates work for outgoing messages
+- [ ] Test 1: Listen command starts message monitoring
+- [ ] Test 2: Messages appear in real-time in terminal
+- [ ] Test 3: Graceful shutdown works properly
+- [ ] Test 4: Different output formats display correctly
+- [ ] Test 5: Message filtering options work as expected
 
-## Phase 5: Session Management
+## Phase 4: Advanced Features
 
-### Task 12: Session Management API
+### Task 10: Media Message Support
 
-- [ ] Implement session creation and initialization endpoints
-- [ ] Add QR code generation and retrieval functionality
-- [ ] Create session status monitoring endpoints
-- [ ] Implement session termination and cleanup
-- [ ] Add support for multiple session management (optional)
+- [ ] Implement media message detection and metadata display
+- [ ] Add optional media file download functionality
+- [ ] Create media sending capability via CLI
+- [ ] Handle different media types (images, documents, audio)
+- [ ] Implement media file validation and error handling
 
 **Requirements:**
 
-- [ ] F5.1 - Start and stop WhatsApp sessions
-- [ ] F5.2 - Monitor session connection status
-- [ ] F5.4 - Provide session health monitoring
-- [ ] F1.2 - Authenticate WhatsApp session using QR code scanning
+- [ ] F2.4 - Support media messages (show metadata, optional download)
+- [ ] F3.3 - Send media files via CLI commands
+- [ ] NF3.5 - Input validation and sanitization
 
 **Tests:**
 
-- [ ] Test 1: New sessions can be created successfully
-- [ ] Test 2: QR code is generated and retrievable
-- [ ] Test 3: Session status is monitored accurately
-- [ ] Test 4: Sessions can be terminated properly
-- [ ] Test 5: Multiple sessions work independently (if implemented)
+- [ ] Test 1: Media messages display metadata correctly
+- [ ] Test 2: Media files can be downloaded when requested
+- [ ] Test 3: Media files can be sent via CLI commands
+- [ ] Test 4: Different media types are handled properly
+- [ ] Test 5: Invalid media files are rejected with clear errors
 
-### Task 13: Session Management UI
+### Task 11: Group Message Support
 
-- [ ] Create SessionManager component for session control
-- [ ] Implement QRCodeDisplay component for authentication
-- [ ] Add ConnectionStatus component with visual indicators
-- [ ] Create session restart functionality
-- [ ] Add session configuration options
+- [ ] Implement group message detection and handling
+- [ ] Add group participant identification and display
+- [ ] Create group message sending functionality
+- [ ] Implement group listing and management commands
+- [ ] Add group-specific formatting and display options
 
 **Requirements:**
 
-- [ ] F5.1 - Start and stop WhatsApp sessions
-- [ ] F5.5 - Allow manual session restart
-- [ ] F1.2 - Authenticate WhatsApp session using QR code scanning
-- [ ] NF4.2 - Clear error messages and notifications
+- [ ] F2.5 - Support group messages with participant identification
+- [ ] F3.2 - Send text messages to groups via CLI
+- [ ] F4.2 - Display real-time incoming messages with formatting
 
 **Tests:**
 
-- [ ] Test 1: Session can be started from UI
-- [ ] Test 2: QR code is displayed for scanning
-- [ ] Test 3: Connection status updates in real-time
-- [ ] Test 4: Session restart functionality works
-- [ ] Test 5: Error messages are displayed clearly
+- [ ] Test 1: Group messages are detected and handled correctly
+- [ ] Test 2: Participant information is displayed properly
+- [ ] Test 3: Messages can be sent to groups via CLI
+- [ ] Test 4: Group listing commands work correctly
+- [ ] Test 5: Group-specific formatting enhances readability
 
-## Phase 6: Message Operations
+### Task 12: Configuration Management
 
-### Task 14: Message Sending Implementation
-
-- [ ] Create message sending API endpoints
-- [ ] Implement message validation and preprocessing
-- [ ] Add support for different message types (text, media)
-- [ ] Implement message delivery confirmation
-- [ ] Add error handling for failed message sending
+- [ ] Create configuration file structure and loading
+- [ ] Implement environment variable support
+- [ ] Add configuration validation and error handling
+- [ ] Create configuration management commands
+- [ ] Implement secure storage of sensitive data
 
 **Requirements:**
 
-- [ ] F3.1 - Send text messages to individual contacts
-- [ ] F3.5 - Provide message delivery confirmation
-- [ ] F3.6 - Handle message sending failures gracefully
-- [ ] NF1.1 - Message delivery time < 2 seconds
+- [ ] T3.2 - Environment configuration management
+- [ ] NF3.4 - Secure storage of sensitive configuration data
+- [ ] NF3.5 - Input validation and sanitization
 
 **Tests:**
 
-- [ ] Test 1: Text messages are sent successfully
-- [ ] Test 2: Message validation prevents invalid inputs
-- [ ] Test 3: Delivery confirmations are received
-- [ ] Test 4: Failed messages are handled gracefully
-- [ ] Test 5: Message sending completes within time limits
+- [ ] Test 1: Configuration files are loaded correctly
+- [ ] Test 2: Environment variables override defaults
+- [ ] Test 3: Invalid configuration is rejected with clear errors
+- [ ] Test 4: Configuration commands work properly
+- [ ] Test 5: Sensitive data is stored securely
 
-### Task 15: Advanced Message Features
+## Phase 5: Error Handling and Reliability
 
-- [ ] Implement media message support (images, documents)
-- [ ] Add message quoting/reply functionality
-- [ ] Create message search functionality
-- [ ] Implement message pagination for conversation history
-- [ ] Add message export functionality (optional)
+### Task 13: Comprehensive Error Handling
 
-**Requirements:**
-
-- [ ] F2.4 - Support media messages (images, videos, documents)
-- [ ] F3.3 - Send media files (images, documents)
-- [ ] F4.7 - Search functionality for messages and contacts
-
-**Tests:**
-
-- [ ] Test 1: Media messages are received and displayed correctly
-- [ ] Test 2: Media files can be sent successfully
-- [ ] Test 3: Message search returns relevant results
-- [ ] Test 4: Message pagination loads additional messages
-- [ ] Test 5: Message export functionality works (if implemented)
-
-## Phase 7: Error Handling and Security
-
-### Task 16: Comprehensive Error Handling
-
-- [ ] Implement global error handler for unhandled exceptions
-- [ ] Add specific error handling for WPPConnect API failures
-- [ ] Create user-friendly error messages and notifications
+- [ ] Implement custom error classes for different error types
+- [ ] Add global error handling for unhandled exceptions
+- [ ] Create user-friendly error messages for CLI users
 - [ ] Implement retry logic for transient failures
-- [ ] Add error logging and monitoring
+- [ ] Add error logging and debugging information
 
 **Requirements:**
 
@@ -366,44 +293,65 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 
 **Tests:**
 
-- [ ] Test 1: API failures are handled gracefully
+- [ ] Test 1: Different error types are handled appropriately
 - [ ] Test 2: User-friendly error messages are displayed
 - [ ] Test 3: Retry logic works for transient failures
-- [ ] Test 4: Errors are logged properly
-- [ ] Test 5: Application remains stable during errors
+- [ ] Test 4: Errors are logged with sufficient detail
+- [ ] Test 5: Application remains stable during error conditions
 
-### Task 17: Security Implementation
+### Task 14: Connection Reliability
 
-- [ ] Implement JWT-based authentication for API endpoints
-- [ ] Add input validation and sanitization middleware
-- [ ] Configure HTTPS and SSL certificates
-- [ ] Implement rate limiting for API endpoints
-- [ ] Add security headers and CORS configuration
+- [ ] Implement automatic reconnection logic
+- [ ] Add connection monitoring and health checks
+- [ ] Create connection failure detection and recovery
+- [ ] Implement session persistence across disconnections
+- [ ] Add network connectivity monitoring
 
 **Requirements:**
 
-- [ ] NF3.1 - Secure API authentication using tokens
-- [ ] NF3.3 - Protection against unauthorized access
-- [ ] NF3.5 - Input validation and sanitization
-- [ ] T3.4 - SSL/TLS certificate support
+- [ ] F1.4 - Handle connection failures and automatic reconnection
+- [ ] NF2.2 - Automatic reconnection on connection failures
+- [ ] NF2.1 - System uptime > 99.5%
 
 **Tests:**
 
-- [ ] Test 1: Authentication prevents unauthorized access
-- [ ] Test 2: Input validation blocks malicious inputs
-- [ ] Test 3: HTTPS connections work properly
-- [ ] Test 4: Rate limiting prevents abuse
-- [ ] Test 5: Security headers are configured correctly
+- [ ] Test 1: Automatic reconnection works after disconnection
+- [ ] Test 2: Connection health checks detect issues properly
+- [ ] Test 3: Session state is preserved during reconnection
+- [ ] Test 4: Network connectivity issues are handled gracefully
+- [ ] Test 5: System maintains high uptime under various conditions
 
-## Phase 8: Testing and Quality Assurance
+### Task 15: Logging and Monitoring
 
-### Task 18: Unit Testing Implementation
+- [ ] Implement comprehensive logging system with Winston
+- [ ] Add configurable log levels and output formats
+- [ ] Create log file rotation and management
+- [ ] Implement performance monitoring and metrics
+- [ ] Add debugging and troubleshooting utilities
 
-- [ ] Set up testing framework (Jest/Vitest) for backend and frontend
+**Requirements:**
+
+- [ ] T3.4 - Logging to files and terminal
+- [ ] NF2.4 - Graceful error handling and recovery
+- [ ] NF1.4 - CLI response time < 200ms for commands
+
+**Tests:**
+
+- [ ] Test 1: Logging system captures all relevant events
+- [ ] Test 2: Log levels and formats work correctly
+- [ ] Test 3: Log file rotation prevents disk space issues
+- [ ] Test 4: Performance metrics are collected accurately
+- [ ] Test 5: Debugging utilities provide useful information
+
+## Phase 6: Testing and Quality Assurance
+
+### Task 16: Unit Testing Implementation
+
+- [ ] Set up Jest testing framework for Node.js/TypeScript
 - [ ] Write unit tests for WPPConnect service layer
-- [ ] Create tests for message processing logic
-- [ ] Add tests for API endpoints and middleware
-- [ ] Implement frontend component testing
+- [ ] Create tests for CLI command parsing and validation
+- [ ] Add tests for message processing logic
+- [ ] Implement mocking for external dependencies
 
 **Requirements:**
 
@@ -412,18 +360,18 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 **Tests:**
 
 - [ ] Test 1: All service layer functions have unit tests
-- [ ] Test 2: Message processing logic is thoroughly tested
-- [ ] Test 3: API endpoints have comprehensive test coverage
-- [ ] Test 4: Frontend components render correctly
+- [ ] Test 2: CLI commands are thoroughly tested
+- [ ] Test 3: Message processing logic is validated
+- [ ] Test 4: External dependencies are properly mocked
 - [ ] Test 5: Test coverage meets minimum threshold (80%+)
 
-### Task 19: Integration Testing
+### Task 17: Integration Testing
 
 - [ ] Set up integration testing environment
 - [ ] Create end-to-end message flow tests
 - [ ] Test WPPConnect Server communication
 - [ ] Implement webhook testing with mock data
-- [ ] Add performance testing for real-time features
+- [ ] Add CLI integration tests with real commands
 
 **Requirements:**
 
@@ -433,59 +381,102 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 
 **Tests:**
 
-- [ ] Test 1: Complete message flow from WhatsApp to UI works
+- [ ] Test 1: Complete message flow from WhatsApp to CLI works
 - [ ] Test 2: WPPConnect Server integration is reliable
 - [ ] Test 3: Webhook processing handles various message types
 - [ ] Test 4: Real-time performance meets requirements
-- [ ] Test 5: System handles concurrent users properly
+- [ ] Test 5: CLI commands work correctly in integration scenarios
 
-## Phase 9: Deployment and Documentation
+### Task 18: Performance Testing
 
-### Task 20: Production Deployment Setup
-
-- [ ] Create production Docker configuration
-- [ ] Set up process management with PM2
-- [ ] Configure monitoring and logging for production
-- [ ] Implement backup and recovery procedures
-- [ ] Set up CI/CD pipeline for automated deployments
+- [ ] Implement performance benchmarking for CLI commands
+- [ ] Test message processing performance under load
+- [ ] Validate real-time message delivery latency
+- [ ] Test concurrent operation handling
+- [ ] Create performance regression testing
 
 **Requirements:**
 
-- [ ] T3.3 - Process management (PM2 or similar)
-- [ ] T3.5 - Monitoring and logging capabilities
-- [ ] NF2.1 - System uptime > 99.5%
+- [ ] NF1.1 - Message delivery time < 2 seconds
+- [ ] NF1.2 - Real-time message updates < 1 second latency
+- [ ] NF1.4 - CLI response time < 200ms for commands
 
 **Tests:**
 
-- [ ] Test 1: Production deployment completes successfully
-- [ ] Test 2: Process management handles application restarts
-- [ ] Test 3: Monitoring captures system metrics
-- [ ] Test 4: Backup procedures work correctly
-- [ ] Test 5: CI/CD pipeline deploys without errors
+- [ ] Test 1: CLI commands respond within 200ms
+- [ ] Test 2: Message delivery meets performance requirements
+- [ ] Test 3: Real-time updates are delivered promptly
+- [ ] Test 4: System handles concurrent operations efficiently
+- [ ] Test 5: Performance doesn't degrade over time
 
-### Task 21: Documentation and User Guides
+## Phase 7: Distribution and Documentation
 
-- [ ] Create installation and setup guide
-- [ ] Write user manual for application features
-- [ ] Document API endpoints and usage
-- [ ] Create troubleshooting guide
-- [ ] Add developer documentation for future enhancements
+### Task 19: NPM Package Setup
+
+- [ ] Configure package.json for NPM publication
+- [ ] Set up TypeScript compilation and build process
+- [ ] Create executable binary configuration
+- [ ] Implement global and local installation support
+- [ ] Add package versioning and release management
 
 **Requirements:**
 
-- [ ] D1 - API documentation for all endpoints
+- [ ] T3.1 - Simple installation via npm or standalone executable
+- [ ] T1.2 - Node.js runtime environment
+
+**Tests:**
+
+- [ ] Test 1: Package builds correctly with TypeScript
+- [ ] Test 2: Global installation works properly
+- [ ] Test 3: Local installation and usage work
+- [ ] Test 4: Executable binary runs correctly
+- [ ] Test 5: Package versioning is handled properly
+
+### Task 20: Documentation Creation
+
+- [ ] Create comprehensive CLI usage documentation
+- [ ] Write installation and setup guide
+- [ ] Document all CLI commands with examples
+- [ ] Create troubleshooting guide for common issues
+- [ ] Add configuration reference and API documentation
+
+**Requirements:**
+
+- [ ] D1 - CLI usage documentation and examples
 - [ ] D2 - Installation and setup guide
-- [ ] D3 - User manual for application features
-- [ ] D4 - Troubleshooting guide
-- [ ] D5 - Development documentation for future enhancements
+- [ ] D3 - Troubleshooting guide
+- [ ] D4 - API integration documentation
+- [ ] D5 - Configuration reference
 
 **Tests:**
 
 - [ ] Test 1: Installation guide allows successful setup
-- [ ] Test 2: User manual covers all features clearly
-- [ ] Test 3: API documentation is accurate and complete
+- [ ] Test 2: CLI documentation covers all commands clearly
+- [ ] Test 3: Examples in documentation work correctly
 - [ ] Test 4: Troubleshooting guide resolves common issues
-- [ ] Test 5: Developer documentation enables contributions
+- [ ] Test 5: Configuration reference is accurate and complete
+
+### Task 21: Production Deployment
+
+- [ ] Create production configuration and environment setup
+- [ ] Implement process management with PM2 or systemd
+- [ ] Set up monitoring and alerting for production
+- [ ] Create backup and recovery procedures
+- [ ] Implement automated deployment and updates
+
+**Requirements:**
+
+- [ ] T3.3 - Process management capabilities
+- [ ] NF2.1 - System uptime > 99.5%
+- [ ] T3.4 - Logging to files and terminal
+
+**Tests:**
+
+- [ ] Test 1: Production deployment completes successfully
+- [ ] Test 2: Process management handles application lifecycle
+- [ ] Test 3: Monitoring captures important metrics
+- [ ] Test 4: Backup procedures work correctly
+- [ ] Test 5: Automated updates deploy without issues
 
 ## Task Dependencies
 
@@ -493,32 +484,29 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 
 1. Task 1 → Task 2 → Task 3 (Foundation)
 2. Task 4 → Task 5 → Task 6 (Core Integration)
-3. Task 9 → Task 10 → Task 11 (Frontend)
-4. Task 12 → Task 13 (Session Management)
-5. Task 14 → Task 15 (Message Operations)
+3. Task 7 → Task 8 → Task 9 (Message Processing)
+4. Task 13 → Task 14 → Task 15 (Reliability)
 
 ### Parallel Tracks
 
-- Tasks 7-8 can run parallel with Tasks 4-6
-- Tasks 9-11 can start after Task 6 completion
-- Tasks 16-17 can run parallel with feature development
-- Tasks 18-19 should run continuously with development
-- Tasks 20-21 can begin in final phases
+- Tasks 10-12 can run parallel with Tasks 13-15
+- Tasks 16-18 should run continuously with development
+- Tasks 19-21 can begin in final phases
 
 ## Success Criteria
 
 ### MVP Completion
 
 - [ ] All Phase 1-3 tasks completed
-- [ ] Basic message sending and receiving works
+- [ ] Basic message sending and receiving works via CLI
 - [ ] Session management is functional
-- [ ] Core UI components are working
+- [ ] Core CLI commands are working
 
 ### Full Feature Completion
 
 - [ ] All tasks completed successfully
 - [ ] Performance requirements met
-- [ ] Security measures implemented
+- [ ] Error handling implemented
 - [ ] Testing coverage adequate
 - [ ] Documentation complete
 
@@ -526,6 +514,44 @@ This document breaks down the implementation of the WhatsApp WPPConnect integrat
 
 - [ ] Zero critical bugs in production
 - [ ] Performance benchmarks met
-- [ ] Security audit passed
-- [ ] User acceptance testing completed
-- [ ] All tests passing consistently
+- [ ] CLI usability testing passed
+- [ ] All automated tests passing consistently
+- [ ] Documentation enables successful user onboarding
+
+## Example Implementation Timeline
+
+### Week 1-2: Foundation (Tasks 1-3)
+
+- Set up project structure and CLI framework
+- Configure WPPConnect Server integration
+- Implement basic CLI command structure
+
+### Week 3-4: Core Integration (Tasks 4-6)
+
+- Build WPPConnect service layer
+- Implement CLI commands for session management
+- Add QR code authentication flow
+
+### Week 5-6: Message Processing (Tasks 7-9)
+
+- Create webhook server for message receiving
+- Implement message display and formatting
+- Add real-time message listening capability
+
+### Week 7-8: Advanced Features (Tasks 10-12)
+
+- Add media message support
+- Implement group messaging functionality
+- Create configuration management system
+
+### Week 9-10: Quality & Reliability (Tasks 13-15)
+
+- Implement comprehensive error handling
+- Add connection reliability features
+- Set up logging and monitoring
+
+### Week 11-12: Testing & Distribution (Tasks 16-21)
+
+- Complete testing suite implementation
+- Prepare NPM package for distribution
+- Create documentation and deployment guides
