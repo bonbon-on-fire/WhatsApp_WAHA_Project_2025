@@ -2,29 +2,30 @@
 
 ## High-Level Overview
 
-A raw and functional Node.js framework for sending and receiving WhatsApp messages using WPPConnect server tool. This framework serves as a foundational component for an AI-powered medical assistant, focusing solely on core messaging functionality without any frontend interface. All conversations are logged chronologically for future AI integration.
+A raw and functional messaging integration service that connects a .NET Core application with WhatsApp using WPPConnect Server. This service serves as a foundational component for an AI-powered medical assistant, providing a bridge between the main .NET Core application and WhatsApp messaging capabilities. All conversations are logged chronologically for future AI integration.
 
 ## High-Level Requirements
 
-- **Primary Purpose**: Framework component for AI-powered medical assistant that communicates via WhatsApp
-- **Messaging Scope**: Send/receive text messages, images, and documents through WPPConnect (not Cloud API)
-- **Architecture**: Raw and functional implementation, no frontend needed
-- **Environment**: Local machine development, future-ready for production scaling
-- **Integration**: Designed for eventual AI system integration
+- **Primary Purpose**: Integration service for .NET Core AI-powered medical assistant that communicates via WhatsApp
+- **Messaging Scope**: Send/receive text messages, images, and documents through WPPConnect Server (not Cloud API)
+- **Architecture**: Microservice architecture with WPPConnect Server + .NET Core integration service
+- **Environment**: Local machine development with WPPConnect Server, future-ready for production scaling
+- **Integration**: Seamless integration with existing .NET Core application and future AI system components
 
 ## Existing Solutions
 
-- **WPPConnect**: Open-source Node.js library for WhatsApp Web interface
+- **WPPConnect Server**: Ready-to-use REST API server for WhatsApp Web interface (chosen solution)
+- **WPPConnect Library**: Node.js library for direct integration (not used - using server instead)
 - **WhatsApp Cloud API**: Official but not preferred for this project
-- **Puppeteer-based solutions**: Similar web-scraping approaches
 - **Baileys**: Alternative WhatsApp Web API library
+- **.NET Core HttpClient**: For REST API communication with WPPConnect Server
 
 ## Current Implementation
 
 - **Status**: Starting from scratch - empty workspace
 - **Previous Work**: Evidence of deleted documentation files (design.md, requirements.md, tasks.md)
-- **Technology Stack**: None currently defined
-- **Dependencies**: No existing packages installed
+- **Technology Stack**: .NET Core (main application) + WPPConnect Server (Node.js microservice)
+- **Dependencies**: .NET Core project exists, WPPConnect Server needs to be set up
 
 ## Detailed Requirements
 
@@ -161,909 +162,466 @@ CREATE TABLE conversations (
 CREATE INDEX idx_conversations_content_fts ON conversations USING gin(to_tsvector('english', content));
 ```
 
-## Project Structure Recommendations
+## Architecture Overview
 
-### Recommended Directory Structure
+### System Architecture
 
 ```
-whatsapp-messaging-framework/
+┌─────────────────────┐    HTTP/REST API    ┌──────────────────────┐    WebSocket/HTTP    ┌─────────────────────┐
+│                     │ ◄──────────────────► │                      │ ◄──────────────────► │                     │
+│   .NET Core App     │                      │  WPPConnect Server   │                      │    WhatsApp Web     │
+│  (Main Application) │                      │   (Node.js Service)  │                      │                     │
+│                     │                      │                      │                      │                     │
+└─────────────────────┘                      └──────────────────────┘                      └─────────────────────┘
+          │                                             │
+          │                                             │
+          ▼                                             ▼
+┌─────────────────────┐                      ┌──────────────────────┐
+│                     │                      │                      │
+│  SQL Server/SQLite  │                      │   Session Storage    │
+│  (Conversation DB)  │                      │   (WPPConnect Data)  │
+│                     │                      │                      │
+└─────────────────────┘                      └──────────────────────┘
+```
+
+### Project Structure Recommendations
+
+```
+YourDotNetProject/                         # Main .NET Core application
 ├── src/
-│   ├── core/
-│   │   ├── wppconnect-client.js       # WPPConnect initialization and management
-│   │   ├── message-sender.js          # Outgoing message handling
-│   │   ├── message-receiver.js        # Incoming message handling
-│   │   └── session-manager.js         # WhatsApp session management
-│   ├── database/
-│   │   ├── connection.js              # Database connection setup
-│   │   ├── migrations/                # Database schema migrations
-│   │   │   └── 001-initial-schema.sql
-│   │   ├── models/                    # Data models
-│   │   │   ├── conversation.js
-│   │   │   ├── chat-session.js
-│   │   │   └── media-file.js
-│   │   └── queries.js                 # Common database queries
-│   ├── services/
-│   │   ├── logging-service.js         # Message logging service
-│   │   ├── media-service.js           # File handling for images/documents
-│   │   └── event-service.js           # Event handling for AI integration
-│   ├── utils/
-│   │   ├── config.js                  # Configuration management
-│   │   ├── logger.js                  # Application logging
-│   │   └── helpers.js                 # Utility functions
-│   └── index.js                       # Main application entry point
-├── storage/
-│   ├── media/                         # Uploaded images and documents
-│   ├── database/                      # SQLite database files
-│   └── logs/                          # Application logs
-├── config/
-│   ├── default.json                   # Default configuration
-│   ├── development.json               # Development environment config
-│   └── production.json                # Production environment config
-├── tests/
-│   ├── unit/                          # Unit tests
-│   ├── integration/                   # Integration tests
-│   └── fixtures/                      # Test data
-├── docs/
-│   ├── api.md                         # API documentation
-│   ├── deployment.md                  # Deployment guide
-│   └── examples.md                    # Usage examples
-├── package.json
-├── .env.example                       # Environment variables template
-├── .gitignore
-└── README.md
+│   ├── YourApp.Api/                       # Main API project
+│   ├── YourApp.Core/                      # Business logic
+│   ├── YourApp.Infrastructure/            # Data access
+│   └── YourApp.Services/
+│       └── WhatsApp/                      # WhatsApp integration service
+│           ├── IWhatsAppService.cs
+│           ├── WhatsAppService.cs
+│           ├── Models/
+│           │   ├── WhatsAppMessage.cs
+│           │   ├── SendMessageRequest.cs
+│           │   └── WebhookEvent.cs
+│           └── Configuration/
+│               └── WhatsAppOptions.cs
+├── infrastructure/
+│   └── wppconnect-server/                 # WPPConnect Server instance
+│       ├── Dockerfile                     # Container for WPPConnect Server
+│       ├── docker-compose.yml             # Orchestration
+│       └── config/
+│           └── production.ts              # WPPConnect Server config
+└── database/
+    ├── migrations/                        # EF Core migrations
+    └── seed-data/                         # Initial data
 ```
 
-### Key Files and Their Purposes
+### Key Components and Their Purposes
 
-#### `src/core/wppconnect-client.js`
+#### WPPConnect Server Setup
 
-```javascript
-const wppconnect = require('@wppconnect-team/wppconnect');
-const EventEmitter = require('events');
-const LoggingService = require('../services/logging-service');
+Install and run WPPConnect Server as a separate service:
 
-/**
- * Handles WPPConnect initialization, QR code management, session persistence
- */
-class WPPConnectClient extends EventEmitter {
-    constructor(config) {
-        super();
-        this.config = config;
-        this.client = null;
-        this.isConnected = false;
-        this.loggingService = new LoggingService();
-    }
+```bash
+# Clone and setup WPPConnect Server
+git clone https://github.com/wppconnect-team/wppconnect-server.git
+cd wppconnect-server
+npm install
 
-    async initialize() {
-        try {
-            this.client = await wppconnect.create({
-                sessionName: this.config.sessionName,
-                headless: this.config.headless,
-                devtools: this.config.devtools,
-                browserArgs: this.config.browserArgs,
-                onLoadingScreen: (percent, message) => {
-                    console.log('Loading:', percent, message);
-                },
-                onQrCode: (base64Qr, asciiQR) => {
-                    console.log('QR Code generated. Scan to authenticate.');
-                    console.log(asciiQR);
-                }
-            });
+# Configure in config.ts
+export const config = {
+  secretKey: 'your-secret-key',
+  host: 'http://localhost',
+  port: '21465',
+  deviceName: 'Medical-Assistant',
+  poweredBy: 'YourApp',
+  startAllSession: true,
+  tokenStoreType: 'file',
+  webhook: {
+    url: 'http://localhost:5000/api/webhook/whatsapp', // Your .NET Core webhook
+    autoDownload: true,
+    readMessage: false,
+    allUnreadOnStart: true
+  }
+};
 
-            this.isConnected = true;
-            this.setupEventListeners();
-            this.emit('connected');
-            
-            return this.client;
-        } catch (error) {
-            this.emit('error', error);
-            throw error;
-        }
-    }
+# Start server
+npm run dev
+```
 
-    setupEventListeners() {
-        // Listen for incoming messages
-        this.client.onMessage(async (message) => {
-            try {
-                await this.handleIncomingMessage(message);
-            } catch (error) {
-                console.error('Error handling incoming message:', error);
-            }
-        });
+#### .NET Core WhatsApp Service
 
-        // Handle disconnections
-        this.client.onStateChange((state) => {
-            if (state === 'DISCONNECTED') {
-                this.isConnected = false;
-                this.emit('disconnected');
-            }
-        });
-    }
+```csharp
+using System.Text.Json;
 
-    async handleIncomingMessage(message) {
-        const messageData = {
-            chatId: message.from,
-            messageId: message.id,
-            senderType: 'user',
-            senderId: message.sender.id,
-            senderName: message.sender.pushname || message.sender.name,
-            messageType: this.getMessageType(message),
-            content: message.body || null,
-            mediaPath: null,
-            caption: message.caption || null,
-            metadata: JSON.stringify({
-                timestamp: message.timestamp,
-                isForwarded: message.isForwarded,
-                quotedMessage: message.quotedMsg
-            })
-        };
-
-        // Handle media files
-        if (message.hasMedia) {
-            const media = await message.downloadMedia();
-            const mediaPath = await this.saveMedia(media, message);
-            messageData.mediaPath = mediaPath;
-        }
-
-        // Log to database
-        await this.loggingService.logMessage(messageData);
-
-        // Emit event for AI processing
-        this.emit('messageReceived', messageData);
-    }
-
-    getMessageType(message) {
-        if (message.hasMedia) {
-            if (message.type === 'image') return 'image';
-            if (message.type === 'document') return 'document';
-        }
-        return 'text';
-    }
-
-    async saveMedia(media, message) {
-        const fs = require('fs').promises;
-        const path = require('path');
-        const { v4: uuidv4 } = require('uuid');
-
-        const extension = media.mimetype.split('/')[1];
-        const filename = `${uuidv4()}.${extension}`;
-        const filePath = path.join(this.config.mediaPath, filename);
-
-        await fs.writeFile(filePath, media.data, 'base64');
-        return filePath;
-    }
-
-    async sendText(chatId, message) {
-        if (!this.isConnected) {
-            throw new Error('Client not connected');
-        }
-
-        try {
-            const result = await this.client.sendText(chatId, message);
-            
-            // Log outgoing message
-            await this.loggingService.logMessage({
-                chatId,
-                messageId: result.id,
-                senderType: 'bot',
-                messageType: 'text',
-                content: message,
-                deliveryStatus: 'sent'
-            });
-
-            return result;
-        } catch (error) {
-            console.error('Error sending text message:', error);
-            throw error;
-        }
-    }
-
-    async sendImage(chatId, filePath, caption = '') {
-        if (!this.isConnected) {
-            throw new Error('Client not connected');
-        }
-
-        try {
-            const result = await this.client.sendImage(chatId, filePath, 'image', caption);
-            
-            // Log outgoing message
-            await this.loggingService.logMessage({
-                chatId,
-                messageId: result.id,
-                senderType: 'bot',
-                messageType: 'image',
-                mediaPath: filePath,
-                caption,
-                deliveryStatus: 'sent'
-            });
-
-            return result;
-        } catch (error) {
-            console.error('Error sending image:', error);
-            throw error;
-        }
-    }
-
-    async sendDocument(chatId, filePath, caption = '') {
-        if (!this.isConnected) {
-            throw new Error('Client not connected');
-        }
-
-        try {
-            const result = await this.client.sendFile(chatId, filePath, 'document', caption);
-            
-            // Log outgoing message
-            await this.loggingService.logMessage({
-                chatId,
-                messageId: result.id,
-                senderType: 'bot',
-                messageType: 'document',
-                mediaPath: filePath,
-                caption,
-                deliveryStatus: 'sent'
-            });
-
-            return result;
-        } catch (error) {
-            console.error('Error sending document:', error);
-            throw error;
-        }
-    }
-
-    async disconnect() {
-        if (this.client) {
-            await this.client.close();
-            this.isConnected = false;
-            this.emit('disconnected');
-        }
-    }
+public interface IWhatsAppService
+{
+    Task<bool> SendTextMessageAsync(string phoneNumber, string message);
+    Task<bool> SendImageAsync(string phoneNumber, string imagePath, string caption = "");
+    Task<bool> SendDocumentAsync(string phoneNumber, string documentPath, string caption = "");
+    Task<string> GenerateTokenAsync(string sessionName);
+    Task<bool> StartSessionAsync(string sessionName);
 }
 
-module.exports = WPPConnectClient;
-```
+public class WhatsAppService : IWhatsAppService
+{
+    private readonly HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
+    private readonly IConversationRepository _conversationRepository;
+    private readonly ILogger<WhatsAppService> _logger;
 
-#### `src/services/logging-service.js`
-
-```javascript
-const Database = require('../database/connection');
-const Conversation = require('../database/models/conversation');
-
-/**
- * Handles all conversation logging to database
- */
-class LoggingService {
-    constructor() {
-        this.db = new Database();
+    public WhatsAppService(
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration,
+        IConversationRepository conversationRepository,
+        ILogger<WhatsAppService> logger)
+    {
+        _httpClient = httpClientFactory.CreateClient("WPPConnect");
+        _configuration = configuration;
+        _conversationRepository = conversationRepository;
+        _logger = logger;
     }
 
-    async logMessage(messageData) {
-        try {
-            const conversation = await Conversation.create(messageData);
-            console.log(`Message logged: ${conversation.id}`);
-            return conversation;
-        } catch (error) {
-            console.error('Error logging message:', error);
-            throw error;
-        }
-    }
+    public async Task<bool> SendTextMessageAsync(string phoneNumber, string message)
+    {
+        try
+        {
+            var payload = new
+            {
+                phone = phoneNumber,
+                message = message
+            };
 
-    async getConversationHistory(chatId, limit = 50, offset = 0) {
-        try {
-            return await Conversation.findByChatId(chatId, { limit, offset });
-        } catch (error) {
-            console.error('Error retrieving conversation history:', error);
-            throw error;
-        }
-    }
-
-    async searchMessages(query, filters = {}) {
-        try {
-            return await Conversation.search(query, filters);
-        } catch (error) {
-            console.error('Error searching messages:', error);
-            throw error;
-        }
-    }
-
-    async exportConversation(chatId, format = 'json') {
-        try {
-            const messages = await this.getConversationHistory(chatId, 1000);
+            var sessionName = _configuration["WhatsApp:SessionName"];
+            var response = await _httpClient.PostAsJsonAsync($"{sessionName}/send-message", payload);
             
-            if (format === 'json') {
-                return JSON.stringify(messages, null, 2);
-            }
-            
-            if (format === 'text') {
-                return messages.map(msg => {
-                    const timestamp = new Date(msg.timestamp).toLocaleString();
-                    const sender = msg.sender_type === 'user' ? msg.sender_name : 'Bot';
-                    return `[${timestamp}] ${sender}: ${msg.content || '[Media]'}`;
-                }).join('\n');
-            }
-            
-            throw new Error(`Unsupported format: ${format}`);
-        } catch (error) {
-            console.error('Error exporting conversation:', error);
-            throw error;
-        }
-    }
-
-    async getActiveChats() {
-        try {
-            const query = `
-                SELECT 
-                    chat_id,
-                    contact_name,
-                    contact_phone,
-                    last_message_at,
-                    total_messages
-                FROM chat_sessions 
-                WHERE session_status = 'active'
-                ORDER BY last_message_at DESC
-            `;
-            
-            return await this.db.all(query);
-        } catch (error) {
-            console.error('Error retrieving active chats:', error);
-            throw error;
-        }
-    }
-
-    async updateChatSession(chatId, messageData) {
-        try {
-            const updateQuery = `
-                INSERT INTO chat_sessions (
-                    chat_id, 
-                    contact_name, 
-                    contact_phone, 
-                    first_message_at, 
-                    last_message_at, 
-                    total_messages
-                ) VALUES (?, ?, ?, ?, ?, 1)
-                ON CONFLICT(chat_id) DO UPDATE SET
-                    last_message_at = ?,
-                    total_messages = total_messages + 1,
-                    updated_at = CURRENT_TIMESTAMP
-            `;
-
-            const timestamp = new Date().toISOString();
-            
-            await this.db.run(updateQuery, [
-                chatId,
-                messageData.senderName,
-                messageData.senderId,
-                timestamp,
-                timestamp,
-                timestamp
-            ]);
-        } catch (error) {
-            console.error('Error updating chat session:', error);
-            throw error;
-        }
-    }
-}
-
-module.exports = LoggingService;
-```
-
-#### `src/database/models/conversation.js`
-
-```javascript
-const Database = require('../connection');
-
-/**
- * Data model for conversation entries
- */
-class Conversation {
-    constructor(data) {
-        Object.assign(this, data);
-    }
-
-    static async create(messageData) {
-        const db = new Database();
-        
-        const query = `
-            INSERT INTO conversations (
-                chat_id, message_id, sender_type, sender_id, sender_name,
-                message_type, content, media_path, media_filename, 
-                caption, metadata, delivery_status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        const params = [
-            messageData.chatId,
-            messageData.messageId,
-            messageData.senderType,
-            messageData.senderId,
-            messageData.senderName,
-            messageData.messageType,
-            messageData.content,
-            messageData.mediaPath,
-            messageData.mediaFilename,
-            messageData.caption,
-            messageData.metadata,
-            messageData.deliveryStatus || null
-        ];
-
-        const result = await db.run(query, params);
-        
-        return new Conversation({
-            id: result.lastID,
-            ...messageData
-        });
-    }
-
-    static async findByChatId(chatId, options = {}) {
-        const db = new Database();
-        const { limit = 50, offset = 0, orderBy = 'timestamp ASC' } = options;
-        
-        const query = `
-            SELECT * FROM conversations 
-            WHERE chat_id = ? 
-            ORDER BY ${orderBy}
-            LIMIT ? OFFSET ?
-        `;
-
-        const rows = await db.all(query, [chatId, limit, offset]);
-        return rows.map(row => new Conversation(row));
-    }
-
-    static async findById(id) {
-        const db = new Database();
-        const query = 'SELECT * FROM conversations WHERE id = ?';
-        const row = await db.get(query, [id]);
-        
-        return row ? new Conversation(row) : null;
-    }
-
-    static async updateDeliveryStatus(messageId, status) {
-        const db = new Database();
-        const query = `
-            UPDATE conversations 
-            SET delivery_status = ?, updated_at = CURRENT_TIMESTAMP 
-            WHERE message_id = ?
-        `;
-        
-        return await db.run(query, [status, messageId]);
-    }
-
-    static async search(query, filters = {}) {
-        const db = new Database();
-        let sql = 'SELECT * FROM conversations WHERE 1=1';
-        const params = [];
-
-        // Text search
-        if (query) {
-            sql += ' AND content LIKE ?';
-            params.push(`%${query}%`);
-        }
-
-        // Filter by chat
-        if (filters.chatId) {
-            sql += ' AND chat_id = ?';
-            params.push(filters.chatId);
-        }
-
-        // Filter by message type
-        if (filters.messageType) {
-            sql += ' AND message_type = ?';
-            params.push(filters.messageType);
-        }
-
-        // Filter by sender type
-        if (filters.senderType) {
-            sql += ' AND sender_type = ?';
-            params.push(filters.senderType);
-        }
-
-        // Date range
-        if (filters.startDate) {
-            sql += ' AND timestamp >= ?';
-            params.push(filters.startDate);
-        }
-
-        if (filters.endDate) {
-            sql += ' AND timestamp <= ?';
-            params.push(filters.endDate);
-        }
-
-        sql += ' ORDER BY timestamp DESC';
-
-        if (filters.limit) {
-            sql += ' LIMIT ?';
-            params.push(filters.limit);
-        }
-
-        const rows = await db.all(sql, params);
-        return rows.map(row => new Conversation(row));
-    }
-
-    static async getStatistics(chatId = null) {
-        const db = new Database();
-        let query = `
-            SELECT 
-                COUNT(*) as total_messages,
-                COUNT(CASE WHEN sender_type = 'user' THEN 1 END) as user_messages,
-                COUNT(CASE WHEN sender_type = 'bot' THEN 1 END) as bot_messages,
-                COUNT(CASE WHEN message_type = 'text' THEN 1 END) as text_messages,
-                COUNT(CASE WHEN message_type = 'image' THEN 1 END) as image_messages,
-                COUNT(CASE WHEN message_type = 'document' THEN 1 END) as document_messages,
-                MIN(timestamp) as first_message,
-                MAX(timestamp) as last_message
-            FROM conversations
-        `;
-
-        const params = [];
-        if (chatId) {
-            query += ' WHERE chat_id = ?';
-            params.push(chatId);
-        }
-
-        return await db.get(query, params);
-    }
-}
-
-module.exports = Conversation;
-```
-
-#### `src/database/connection.js`
-
-```javascript
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs').promises;
-
-/**
- * Database connection setup and management
- */
-class Database {
-    constructor(dbPath = null) {
-        this.dbPath = dbPath || path.join(__dirname, '../../storage/database/conversations.db');
-        this.db = null;
-    }
-
-    async connect() {
-        return new Promise((resolve, reject) => {
-            this.db = new sqlite3.Database(this.dbPath, (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    console.log('Connected to SQLite database');
-                    resolve(this.db);
-                }
-            });
-        });
-    }
-
-    async initialize() {
-        await this.ensureDirectoryExists();
-        await this.connect();
-        await this.runMigrations();
-    }
-
-    async ensureDirectoryExists() {
-        const dir = path.dirname(this.dbPath);
-        try {
-            await fs.access(dir);
-        } catch {
-            await fs.mkdir(dir, { recursive: true });
-        }
-    }
-
-    async runMigrations() {
-        const migrationPath = path.join(__dirname, 'migrations/001-initial-schema.sql');
-        try {
-            const schema = await fs.readFile(migrationPath, 'utf8');
-            await this.exec(schema);
-            console.log('Database migrations completed');
-        } catch (error) {
-            console.error('Error running migrations:', error);
-            throw error;
-        }
-    }
-
-    async run(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function(err) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ lastID: this.lastID, changes: this.changes });
-                }
-            });
-        });
-    }
-
-    async get(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, params, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
-        });
-    }
-
-    async all(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-            });
-        });
-    }
-
-    async exec(sql) {
-        return new Promise((resolve, reject) => {
-            this.db.exec(sql, (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
-
-    async close() {
-        return new Promise((resolve, reject) => {
-            if (this.db) {
-                this.db.close((err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        console.log('Database connection closed');
-                        resolve();
-                    }
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var messageResult = JsonSerializer.Deserialize<dynamic>(result);
+                
+                // Log to database
+                await _conversationRepository.LogMessageAsync(new ConversationMessage
+                {
+                    ChatId = phoneNumber,
+                    MessageId = messageResult?.id?.ToString(),
+                    SenderType = "bot",
+                    MessageType = "text",
+                    Content = message,
+                    DeliveryStatus = "sent",
+                    Timestamp = DateTime.UtcNow
                 });
-            } else {
-                resolve();
+
+                return true;
             }
-        });
+            
+            _logger.LogError($"Failed to send message: {response.StatusCode}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending WhatsApp message");
+            return false;
+        }
+    }
+
+    public async Task<bool> SendImageAsync(string phoneNumber, string imagePath, string caption = "")
+    {
+        try
+        {
+            using var form = new MultipartFormDataContent();
+            form.Add(new StringContent(phoneNumber), "phone");
+            form.Add(new StringContent(caption), "caption");
+            
+            var imageBytes = await File.ReadAllBytesAsync(imagePath);
+            form.Add(new ByteArrayContent(imageBytes), "file", Path.GetFileName(imagePath));
+
+            var sessionName = _configuration["WhatsApp:SessionName"];
+            var response = await _httpClient.PostAsync($"{sessionName}/send-image", form);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                // Log to database
+                await _conversationRepository.LogMessageAsync(new ConversationMessage
+                {
+                    ChatId = phoneNumber,
+                    SenderType = "bot",
+                    MessageType = "image",
+                    MediaPath = imagePath,
+                    Caption = caption,
+                    DeliveryStatus = "sent",
+                    Timestamp = DateTime.UtcNow
+                });
+
+                return true;
+            }
+            
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending WhatsApp image");
+            return false;
+        }
+    }
+
+    public async Task<string> GenerateTokenAsync(string sessionName)
+    {
+        try
+        {
+            var secretKey = _configuration["WhatsApp:SecretKey"];
+            var response = await _httpClient.PostAsync($"{sessionName}/{secretKey}/generate-token", null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var tokenResult = JsonSerializer.Deserialize<dynamic>(result);
+                return tokenResult?.token?.ToString();
+            }
+            
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating token");
+            return null;
+        }
+    }
+}
+```
+
+#### Webhook Controller for Incoming Messages
+
+```csharp
+[ApiController]
+[Route("api/webhook")]
+public class WhatsAppWebhookController : ControllerBase
+{
+    private readonly IWhatsAppService _whatsAppService;
+    private readonly IConversationRepository _conversationRepository;
+    private readonly ILogger<WhatsAppWebhookController> _logger;
+
+    public WhatsAppWebhookController(
+        IWhatsAppService whatsAppService,
+        IConversationRepository conversationRepository,
+        ILogger<WhatsAppWebhookController> logger)
+    {
+        _whatsAppService = whatsAppService;
+        _conversationRepository = conversationRepository;
+        _logger = logger;
+    }
+
+    [HttpPost("whatsapp")]
+    public async Task<IActionResult> ReceiveWhatsAppMessage([FromBody] WhatsAppWebhookEvent webhookEvent)
+    {
+        try
+        {
+            // Log incoming message
+            await _conversationRepository.LogMessageAsync(new ConversationMessage
+            {
+                ChatId = webhookEvent.Data.From,
+                MessageId = webhookEvent.Data.Id,
+                SenderType = "user",
+                SenderId = webhookEvent.Data.From,
+                SenderName = webhookEvent.Data.NotifyName,
+                MessageType = GetMessageType(webhookEvent.Data),
+                Content = webhookEvent.Data.Body,
+                MediaPath = webhookEvent.Data.MediaUrl,
+                Caption = webhookEvent.Data.Caption,
+                Timestamp = DateTime.UtcNow
+            });
+
+            // Process message for AI response
+            await ProcessIncomingMessage(webhookEvent.Data);
+
+            return Ok(new { status = "received" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing WhatsApp webhook");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    private async Task ProcessIncomingMessage(WhatsAppMessage message)
+    {
+        // This is where you integrate with your AI medical assistant
+        if (message.Body?.ToLower() == "hello")
+        {
+            await _whatsAppService.SendTextMessageAsync(
+                message.From, 
+                "Hello! I am your medical assistant. How can I help you today?"
+            );
+        }
+        
+        // TODO: Integrate with your AI processing logic here
+    }
+
+    private string GetMessageType(WhatsAppMessage message)
+    {
+        if (!string.IsNullOrEmpty(message.MediaUrl))
+        {
+            if (message.Type == "image") return "image";
+            if (message.Type == "document") return "document";
+        }
+        return "text";
     }
 }
 
-module.exports = Database;
+// Models for webhook data
+public class WhatsAppWebhookEvent
+{
+    public string Event { get; set; }
+    public string Session { get; set; }
+    public WhatsAppMessage Data { get; set; }
+}
+
+public class WhatsAppMessage
+{
+    public string Id { get; set; }
+    public string From { get; set; }
+    public string Type { get; set; }
+    public string Body { get; set; }
+    public string NotifyName { get; set; }
+    public string MediaUrl { get; set; }
+    public string Caption { get; set; }
+    public long Timestamp { get; set; }
+}
 ```
 
-### Configuration Structure
+#### Entity Framework Models
 
-#### `config/default.json`
+```csharp
+public class ConversationMessage
+{
+    public int Id { get; set; }
+    public string ChatId { get; set; }
+    public string MessageId { get; set; }
+    public DateTime Timestamp { get; set; }
+    public string SenderType { get; set; } // 'user' or 'bot'
+    public string SenderId { get; set; }
+    public string SenderName { get; set; }
+    public string MessageType { get; set; } // 'text', 'image', 'document'
+    public string Content { get; set; }
+    public string MediaPath { get; set; }
+    public string MediaFilename { get; set; }
+    public string Caption { get; set; }
+    public string Metadata { get; set; } // JSON string
+    public string DeliveryStatus { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
 
+public class MedicalAssistantDbContext : DbContext
+{
+    public MedicalAssistantDbContext(DbContextOptions<MedicalAssistantDbContext> options) : base(options) { }
+    
+    public DbSet<ConversationMessage> ConversationMessages { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ConversationMessage>(entity =>
+        {
+            entity.HasIndex(e => new { e.ChatId, e.Timestamp });
+            entity.HasIndex(e => e.SenderType);
+            entity.HasIndex(e => e.MessageType);
+        });
+         }
+}
+```
+
+#### Webhook Controller for Incoming Messages
+
+```csharp
+[ApiController]
+[Route("api/webhook")]
+public class WhatsAppWebhookController : ControllerBase
+{
+    private readonly IConversationRepository _conversationRepository;
+    private readonly ILogger<WhatsAppWebhookController> _logger;
+
+    [HttpPost("whatsapp")]
+    public async Task<IActionResult> ReceiveWhatsAppMessage([FromBody] WhatsAppWebhookEvent webhookEvent)
+    {
+        try
+        {
+            // Log incoming message to database
+            await _conversationRepository.LogMessageAsync(new ConversationMessage
+            {
+                ChatId = webhookEvent.Data.From,
+                MessageId = webhookEvent.Data.Id,
+                SenderType = "user",
+                MessageType = webhookEvent.Data.Type,
+                Content = webhookEvent.Data.Body,
+                Timestamp = DateTime.UtcNow
+            });
+
+            // TODO: Integrate with your AI medical assistant processing
+            return Ok(new { status = "received" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing WhatsApp webhook");
+            return StatusCode(500);
+        }
+    }
+}
+```
+
+### .NET Core Dependencies and Configuration
+
+#### appsettings.json
 ```json
 {
-  "database": {
-    "type": "sqlite",
-    "path": "./storage/database/conversations.db"
+  "WhatsApp": {
+    "ServerUrl": "http://localhost:21465/api",
+    "SessionName": "medical-assistant",
+    "SecretKey": "your-secret-key-here",
+    "WebhookToken": "your-webhook-token"
   },
-  "wppconnect": {
-    "sessionName": "medical-assistant",
-    "headless": true,
-    "devtools": false,
-    "browserArgs": ["--no-sandbox", "--disable-setuid-sandbox"]
-  },
-  "storage": {
-    "mediaPath": "./storage/media",
-    "maxFileSize": "10MB"
-  },
-  "logging": {
-    "level": "info",
-    "file": "./storage/logs/app.log"
-  },
-  "app": {
-    "name": "WhatsApp Messaging Framework",
-    "version": "1.0.0"
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=MedicalAssistantDb;Trusted_Connection=true;"
   }
 }
 ```
 
-#### `src/index.js` - Main Application Entry Point
-
-```javascript
-const WPPConnectClient = require('./core/wppconnect-client');
-const Database = require('./database/connection');
-const config = require('config');
-const path = require('path');
-
-/**
- * Main application entry point
- */
-class WhatsAppFramework {
-    constructor() {
-        this.client = null;
-        this.database = null;
-        this.isRunning = false;
-    }
-
-    async initialize() {
-        try {
-            console.log('Initializing WhatsApp Messaging Framework...');
-            
-            // Initialize database
-            this.database = new Database(config.get('database.path'));
-            await this.database.initialize();
-            
-            // Initialize WPPConnect client
-            this.client = new WPPConnectClient({
-                sessionName: config.get('wppconnect.sessionName'),
-                headless: config.get('wppconnect.headless'),
-                devtools: config.get('wppconnect.devtools'),
-                browserArgs: config.get('wppconnect.browserArgs'),
-                mediaPath: config.get('storage.mediaPath')
-            });
-
-            // Set up event handlers
-            this.setupEventHandlers();
-            
-            // Connect to WhatsApp
-            await this.client.initialize();
-            
-            this.isRunning = true;
-            console.log('Framework initialized successfully!');
-            
-        } catch (error) {
-            console.error('Failed to initialize framework:', error);
-            process.exit(1);
-        }
-    }
-
-    setupEventHandlers() {
-        this.client.on('connected', () => {
-            console.log('✅ Connected to WhatsApp');
-        });
-
-        this.client.on('disconnected', () => {
-            console.log('❌ Disconnected from WhatsApp');
-            this.handleDisconnection();
-        });
-
-        this.client.on('messageReceived', (messageData) => {
-            console.log(`📨 Message received from ${messageData.senderName}: ${messageData.content || '[Media]'}`);
-            // Here you can add AI processing logic
-            this.processIncomingMessage(messageData);
-        });
-
-        this.client.on('error', (error) => {
-            console.error('❌ WPPConnect error:', error);
-        });
-
-        // Handle graceful shutdown
-        process.on('SIGINT', () => {
-            console.log('\n🛑 Shutting down gracefully...');
-            this.shutdown();
-        });
-
-        process.on('SIGTERM', () => {
-            console.log('\n🛑 Shutting down gracefully...');
-            this.shutdown();
-        });
-    }
-
-    async processIncomingMessage(messageData) {
-        // This is where you would integrate AI processing
-        console.log(`Processing message from ${messageData.chatId}`);
-        
-        // Example: Simple echo response
-        if (messageData.content && messageData.content.toLowerCase() === 'hello') {
-            await this.client.sendText(messageData.chatId, 'Hello! I am your medical assistant. How can I help you today?');
-        }
-    }
-
-    async handleDisconnection() {
-        console.log('Attempting to reconnect...');
-        setTimeout(async () => {
-            try {
-                await this.client.initialize();
-            } catch (error) {
-                console.error('Reconnection failed:', error);
-            }
-        }, 5000);
-    }
-
-    async shutdown() {
-        try {
-            this.isRunning = false;
-            
-            if (this.client) {
-                await this.client.disconnect();
-            }
-            
-            if (this.database) {
-                await this.database.close();
-            }
-            
-            console.log('✅ Framework shut down successfully');
-            process.exit(0);
-        } catch (error) {
-            console.error('Error during shutdown:', error);
-            process.exit(1);
-        }
-    }
-
-    // Public API methods for external integration
-    async sendMessage(chatId, message) {
-        if (!this.isRunning) {
-            throw new Error('Framework not initialized');
-        }
-        return await this.client.sendText(chatId, message);
-    }
-
-    async sendImage(chatId, imagePath, caption = '') {
-        if (!this.isRunning) {
-            throw new Error('Framework not initialized');
-        }
-        return await this.client.sendImage(chatId, imagePath, caption);
-    }
-
-    async sendDocument(chatId, documentPath, caption = '') {
-        if (!this.isRunning) {
-            throw new Error('Framework not initialized');
-        }
-        return await this.client.sendDocument(chatId, documentPath, caption);
-    }
-
-    async getConversationHistory(chatId, limit = 50) {
-        const loggingService = require('./services/logging-service');
-        const service = new loggingService();
-        return await service.getConversationHistory(chatId, limit);
-    }
-}
-
-// Start the framework if this file is run directly
-if (require.main === module) {
-    const framework = new WhatsAppFramework();
-    framework.initialize().catch(console.error);
-}
-
-module.exports = WhatsAppFramework;
+#### NuGet Packages (.csproj)
+```xml
+<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0" />
+<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0" />
+<PackageReference Include="System.Text.Json" Version="7.0.0" />
+<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
 ```
 
-### Dependencies (`package.json`)
-
-```json
+#### Program.cs Configuration
+```csharp
+builder.Services.AddHttpClient("WPPConnect", client =>
 {
-  "name": "whatsapp-messaging-framework",
-  "version": "1.0.0",
-  "description": "Raw and functional WhatsApp messaging framework using WPPConnect for AI medical assistant",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "jest",
-    "lint": "eslint src/",
-    "migrate": "node scripts/migrate.js"
-  },
-  "dependencies": {
-    "@wppconnect-team/wppconnect": "^1.29.0",
-    "sqlite3": "^5.1.6",
-    "winston": "^3.10.0",
-    "config": "^3.3.9",
-    "dotenv": "^16.3.1",
-    "mime-types": "^2.1.35",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "jest": "^29.6.2",
-    "nodemon": "^3.0.1",
-    "eslint": "^8.46.0",
-    "supertest": "^6.3.3"
-  },
-  "keywords": [
-    "whatsapp",
-    "messaging",
-    "wppconnect",
-    "ai",
-    "medical",
-    "assistant"
-  ],
-  "author": "Your Name",
-  "license": "MIT"
-}
+    var whatsAppConfig = builder.Configuration.GetSection("WhatsApp");
+    client.BaseAddress = new Uri(whatsAppConfig["ServerUrl"]);
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {whatsAppConfig["WebhookToken"]}");
+});
+
+builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
+builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 ```
 
-This specification provides a complete, production-ready foundation for your WhatsApp messaging framework that can easily evolve into your AI medical assistant system.
+## Summary
+
+This specification provides a complete integration architecture between your existing .NET Core application and WhatsApp messaging capabilities through WPPConnect Server. 
+
+### Key Benefits of This Architecture
+
+- **Separation of Concerns**: WPPConnect Server handles WhatsApp connectivity while your .NET Core app handles business logic
+- **Scalability**: Each service can be scaled independently
+- **Maintainability**: Clear boundaries between WhatsApp integration and your medical assistant logic
+- **Technology Consistency**: Keeps your main application in .NET Core while leveraging the mature WPPConnect ecosystem
+- **Production Ready**: Both services can be containerized and deployed separately
+
+### Next Steps
+
+1. **Set up WPPConnect Server** as a separate service
+2. **Implement WhatsApp service** in your .NET Core application
+3. **Create webhook endpoint** to receive incoming messages
+4. **Integrate with your existing AI medical assistant logic**
+5. **Set up Entity Framework** for conversation storage
+6. **Configure dependency injection** for the WhatsApp services
+
+This approach allows you to seamlessly integrate WhatsApp messaging into your existing .NET Core medical assistant while maintaining architectural consistency.
