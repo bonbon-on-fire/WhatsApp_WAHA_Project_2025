@@ -1,0 +1,12 @@
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\bin\Debug\net9.0\WhatsAppWaha.Core.deps.json
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\bin\Debug\net9.0\WhatsAppWaha.Core.dll
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\bin\Debug\net9.0\WhatsAppWaha.Core.pdb
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.AssemblyInfoInputs.cache
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.AssemblyInfo.cs
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.csproj.CoreCompileInputs.cache
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.sourcelink.json
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.dll
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\refint\WhatsAppWaha.Core.dll
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\WhatsAppWaha.Core.pdb
+C:\Users\nishi\WhatsApp_WAHA_Project_2025\src\WhatsAppWaha.Core\obj\Debug\net9.0\ref\WhatsAppWaha.Core.dll
