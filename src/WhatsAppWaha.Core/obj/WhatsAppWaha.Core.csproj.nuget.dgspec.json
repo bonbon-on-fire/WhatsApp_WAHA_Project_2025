@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {}
+    "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
+    "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
+        "projectUniqueName": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
         "projectName": "WhatsAppWaha.Core",
-        "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
+        "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
         "packagesPath": "C:\\Users\\nishi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\obj\\",
+        "outputPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -49,6 +49,36 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
+            "Microsoft.Extensions.Options.DataAnnotations": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
+            "Polly.Extensions.Http": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
+            "Serilog.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

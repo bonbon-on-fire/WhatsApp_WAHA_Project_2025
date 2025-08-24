@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bCwXKaK//AQ=",
+  "dgSpecHash": "KnGOWWh4rUc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.Core.Tests\\WhatsAppWaha.Core.Tests.csproj",
+  "projectFilePath": "D:\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.Core.Tests\\WhatsAppWaha.Core.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nishi\\.nuget\\packages\\coverlet.collector\\6.0.2\\coverlet.collector.6.0.2.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.codecoverage\\17.12.0\\microsoft.codecoverage.17.12.0.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj": {}
+    "D:\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
+    "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
+        "projectUniqueName": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
         "projectName": "WhatsAppWaha.Core",
-        "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
+        "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
         "packagesPath": "C:\\Users\\nishi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\obj\\",
+        "outputPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -69,14 +69,14 @@
         }
       }
     },
-    "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj": {
+    "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj",
+        "projectUniqueName": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj",
         "projectName": "WhatsAppWaha.MessageReceiver",
-        "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj",
+        "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj",
         "packagesPath": "C:\\Users\\nishi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\obj\\",
+        "outputPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -97,8 +97,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
-                "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj"
+              "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
+                "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj"
               }
             }
           }
@@ -138,14 +138,14 @@
         }
       }
     },
-    "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj": {
+    "D:\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj",
+        "projectUniqueName": "D:\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj",
         "projectName": "WhatsAppWaha.MessageReceiver.Tests",
-        "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj",
+        "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\WhatsAppWaha.MessageReceiver.Tests.csproj",
         "packagesPath": "C:\\Users\\nishi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\obj\\",
+        "outputPath": "D:\\WhatsApp_WAHA_Project_2025\\tests\\WhatsAppWaha.MessageReceiver.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -166,11 +166,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
-                "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj"
+              "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj": {
+                "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj"
               },
-              "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj": {
-                "projectPath": "C:\\Users\\nishi\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj"
+              "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj": {
+                "projectPath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.MessageReceiver\\WhatsAppWaha.MessageReceiver.csproj"
               }
             }
           }
