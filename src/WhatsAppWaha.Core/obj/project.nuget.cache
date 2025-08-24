@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Qb3rjQ5uMXY=",
+  "dgSpecHash": "QaZYMb3k39E=",
   "success": true,
   "projectFilePath": "D:\\WhatsApp_WAHA_Project_2025\\src\\WhatsAppWaha.Core\\WhatsAppWaha.Core.csproj",
   "expectedPackageFiles": [
@@ -22,6 +22,7 @@
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.hosting\\9.0.8\\microsoft.extensions.hosting.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\9.0.8\\microsoft.extensions.hosting.abstractions.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.http\\9.0.8\\microsoft.extensions.http.9.0.8.nupkg.sha512",
+    "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.http.polly\\9.0.8\\microsoft.extensions.http.polly.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.logging\\9.0.8\\microsoft.extensions.logging.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\9.0.8\\microsoft.extensions.logging.abstractions.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.logging.configuration\\9.0.8\\microsoft.extensions.logging.configuration.9.0.8.nupkg.sha512",
@@ -33,7 +34,7 @@
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\9.0.8\\microsoft.extensions.options.configurationextensions.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.options.dataannotations\\9.0.8\\microsoft.extensions.options.dataannotations.9.0.8.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\microsoft.extensions.primitives\\9.0.8\\microsoft.extensions.primitives.9.0.8.nupkg.sha512",
-    "C:\\Users\\nishi\\.nuget\\packages\\polly\\7.1.0\\polly.7.1.0.nupkg.sha512",
+    "C:\\Users\\nishi\\.nuget\\packages\\polly\\7.2.4\\polly.7.2.4.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\polly.extensions.http\\3.0.0\\polly.extensions.http.3.0.0.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\serilog\\4.2.0\\serilog.4.2.0.nupkg.sha512",
     "C:\\Users\\nishi\\.nuget\\packages\\serilog.extensions.hosting\\9.0.0\\serilog.extensions.hosting.9.0.0.nupkg.sha512",

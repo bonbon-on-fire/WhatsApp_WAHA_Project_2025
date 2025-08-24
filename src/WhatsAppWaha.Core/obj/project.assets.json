@@ -387,6 +387,24 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "Microsoft.Extensions.Http.Polly/9.0.8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Http": "9.0.8",
+          "Polly": "7.2.4",
+          "Polly.Extensions.Http": "3.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.Extensions.Http.Polly.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Extensions.Http.Polly.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Extensions.Logging/9.0.8": {
         "type": "package",
         "dependencies": {
@@ -622,16 +640,16 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Polly/7.1.0": {
+      "Polly/7.2.4": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/Polly.dll": {
-            "related": ".xml"
+            "related": ".pdb;.xml"
           }
         },
         "runtime": {
           "lib/netstandard2.0/Polly.dll": {
-            "related": ".xml"
+            "related": ".pdb;.xml"
           }
         }
       },
@@ -1289,6 +1307,21 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Microsoft.Extensions.Http.Polly/9.0.8": {
+      "sha512": "gnhe4zmvQO0ZnaLulWDcLTahHEocPJbjminXAHECDWo7/G4GCdthw2MKfefRsJi1kk88GDQd69QGwMDkApuPvw==",
+      "type": "package",
+      "path": "microsoft.extensions.http.polly/9.0.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/netstandard2.0/Microsoft.Extensions.Http.Polly.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Http.Polly.xml",
+        "microsoft.extensions.http.polly.9.0.8.nupkg.sha512",
+        "microsoft.extensions.http.polly.nuspec"
+      ]
+    },
     "Microsoft.Extensions.Logging/9.0.8": {
       "sha512": "Z/7ze+0iheT7FJeZPqJKARYvyC2bmwu3whbm/48BJjdlGVvgDguoCqJIkI/67NkroTYobd5geai1WheNQvWrgA==",
       "type": "package",
@@ -1658,18 +1691,28 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Polly/7.1.0": {
-      "sha512": "mpQsvlEn4ipgICh5CGyVLPV93RFVzOrBG7wPZfzY8gExh7XgWQn0GCDY9nudbUEJ12UiGPP9i4+CohghBvzhmg==",
+    "Polly/7.2.4": {
+      "sha512": "bw00Ck5sh6ekduDE3mnCo1ohzuad946uslCDEENu3091+6UKnBuKLo4e+yaNcCzXxOZCXWY2gV4a35+K1d4LDA==",
       "type": "package",
-      "path": "polly/7.1.0",
+      "path": "polly/7.2.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "README.md",
+        "lib/net461/Polly.dll",
+        "lib/net461/Polly.pdb",
+        "lib/net461/Polly.xml",
+        "lib/net472/Polly.dll",
+        "lib/net472/Polly.pdb",
+        "lib/net472/Polly.xml",
         "lib/netstandard1.1/Polly.dll",
+        "lib/netstandard1.1/Polly.pdb",
         "lib/netstandard1.1/Polly.xml",
         "lib/netstandard2.0/Polly.dll",
+        "lib/netstandard2.0/Polly.pdb",
         "lib/netstandard2.0/Polly.xml",
-        "polly.7.1.0.nupkg.sha512",
+        "package-icon.png",
+        "polly.7.2.4.nupkg.sha512",
         "polly.nuspec"
       ]
     },
@@ -1846,6 +1889,7 @@
     "net9.0": [
       "Microsoft.Extensions.Hosting >= 9.0.8",
       "Microsoft.Extensions.Http >= 9.0.8",
+      "Microsoft.Extensions.Http.Polly >= 9.0.8",
       "Microsoft.Extensions.Options.DataAnnotations >= 9.0.8",
       "Polly.Extensions.Http >= 3.0.0",
       "Serilog.Extensions.Hosting >= 9.0.0",
@@ -1908,6 +1952,10 @@
             "version": "[9.0.8, )"
           },
           "Microsoft.Extensions.Http": {
+            "target": "Package",
+            "version": "[9.0.8, )"
+          },
+          "Microsoft.Extensions.Http.Polly": {
             "target": "Package",
             "version": "[9.0.8, )"
           },
