@@ -10,7 +10,7 @@ Implementation tasks for the WhatsApp WAHA messaging framework, organized by pri
   - [ ] Create solution file `WhatsAppWahaFramework.sln`
   - [ ] Create `WhatsAppWaha.Core` class library project
   - [ ] Create `WhatsAppWaha.HelloWorld` console application project
-  - [ ] Create `WhatsAppWaha.MessagePoller` console application project
+  - [ ] Create `WhatsAppWaha.MessageReceiver` console application project
   - [ ] Create test projects for each component
   - [ ] Configure project references and dependencies
   - **Requirements:**
@@ -160,7 +160,7 @@ Implementation tasks for the WhatsApp WAHA messaging framework, organized by pri
 
 ---
 
-## Task 5: Phase 2 - ntfy Message Polling Infrastructure
+## Task 5: Phase 2 - Message Receiving Infrastructure
 - [ ] **Implement ntfy polling service**
   - [ ] Create `NtfyPollingService` for HTTP GET polling
   - [ ] Add polling configuration (interval, topic name, max messages)
@@ -270,7 +270,7 @@ Implementation tasks for the WhatsApp WAHA messaging framework, organized by pri
 
 - [ ] **Create deployment configurations**
   - [ ] Add production-ready configuration templates
-  - [ ] Create Dockerfile for message polling service
+  - [ ] Create Dockerfile for message receiving service
   - [ ] Add Kubernetes deployment manifests (optional)
   - [ ] Document deployment procedures and requirements
   - **Requirements:**
@@ -370,8 +370,8 @@ Implementation tasks for the WhatsApp WAHA messaging framework, organized by pri
 4. **Task 4**: Phase 1 - Hello World Console Application
 5. **Task 7**: Configuration and Environment Setup (basic)
 
-### Phase 2 Priority (Echo Responder via ntfy Polling)
-6. **Task 5**: Phase 2 - ntfy Message Polling Infrastructure
+### Phase 2 Priority (Echo Responder via Message Receiving)
+6. **Task 5**: Phase 2 - Message Receiving Infrastructure
 7. **Task 6**: Echo Response Message Processing
 8. **Task 8**: Testing Infrastructure and Coverage
 

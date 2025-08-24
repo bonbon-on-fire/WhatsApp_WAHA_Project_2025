@@ -29,9 +29,9 @@ This design document outlines the implementation approach for a .NET Core 9.0 me
 ┌─────────────────────────────────────────────────────────────────┐
 │                    WhatsApp WAHA Messaging Framework            │
 ├─────────────────────────────────────────────────────────────────┤
-│  Phase 1: Console App              │  Phase 2: Polling Service  │
+│  Phase 1: Console App              │  Phase 2: Message Receiver │
 │  ┌─────────────────────────────────┐│  ┌─────────────────────────│
-│  │ HelloWorldSender                ││  │ MessagePollingService   │
+│  │ HelloWorldSender                ││  │ MessageReceivingService │
 │  │ ├─ ArgumentParser               ││  │ ├─ Console/Service Host │
 │  │ ├─ WahaService                  ││  │ ├─ NtfyPollingService   │
 │  │ └─ ConsoleLogger                ││  │ ├─ MessageProcessor     │
@@ -90,7 +90,7 @@ WhatsAppWahaFramework/
 │   │   ├── appsettings.json
 │   │   └── WhatsAppWaha.HelloWorld.csproj
 │   │
-│   └── WhatsAppWaha.MessagePoller/     # Phase 2 Polling Service
+│   └── WhatsAppWaha.MessageReceiver/   # Phase 2 Message Receiving Service
 │       ├── Program.cs
 │       ├── Services/
 │       │   ├── NtfyPollingService.cs
@@ -99,7 +99,7 @@ WhatsAppWahaFramework/
 │       ├── BackgroundServices/
 │       │   └── MessagePollingBackgroundService.cs
 │       ├── appsettings.json
-│       └── WhatsAppWaha.MessagePoller.csproj
+│       └── WhatsAppWaha.MessageReceiver.csproj
 │
 ├── tests/
 │   ├── WhatsAppWaha.Core.Tests/
@@ -235,7 +235,7 @@ public class HelloWorldService
 - **Argument Validation**: Robust command-line parsing
 - **Dependency Injection**: Full DI container even for console app
 
-### 5. Phase 2: Message Polling Service
+### 5. Phase 2: Message Receiving Service
 ```csharp
 public class MessagePollingBackgroundService : BackgroundService
 {

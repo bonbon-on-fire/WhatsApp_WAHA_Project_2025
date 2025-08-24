@@ -55,7 +55,7 @@ AI-powered medical assistant chatbot framework working through WhatsApp using WA
 3. **Phase 2**: ntfy polling service for echo responses (REVISED)
 4. **Integration Pattern**: WAHA → ntfy (webhook) → .NET App (polling) + .NET App → ntfy (monitoring)
 5. **Technology Stack**: .NET Core 9.0, Docker (WAHA), HTTP APIs, ntfy polling
-6. **Project Structure**: Multi-project solution with Core, HelloWorld, and MessagePoller projects (REVISED)
+6. **Project Structure**: Multi-project solution with Core, HelloWorld, and MessageReceiver projects (REVISED)
 7. **Testing Strategy**: Unit, integration, and performance testing with >80% coverage
 8. **Extensibility**: Interface-based design ready for AI medical assistant features
 
@@ -67,7 +67,7 @@ AI-powered medical assistant chatbot framework working through WhatsApp using WA
 - ✅ **Research Documentation**: Complete ScratchPad with user feedback and technical research
 
 ## Major Architecture Changes Applied
-- **WebhookReceiver** → **MessagePoller** (project renamed)
+- **WebhookReceiver** → **MessageReceiver** (project renamed)
 - **ASP.NET Core webhook endpoints** → **Background polling service**
 - **Direct webhook handling** → **ntfy message relay with polling**
 - **Immediate HTTP responses** → **Polling loop with configurable intervals**
